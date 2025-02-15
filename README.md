@@ -1,4 +1,4 @@
-    # AI Financial Planning Assistant
+# AI Financial Planning Assistant
 **Consulti** is an AI-powered consultant agent designed to help businesses and startups develop comprehensive financial plans. By leveraging advanced language models, vector search, and automated data extraction, this platform streamlines the process of preparing financial projections, budgeting, and applying for grants and investments.
 ---
 ## Team
