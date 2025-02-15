@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import os
 import openai
 import json
+from consultent_agent import main
+
 
 # Load environment variables
 load_dotenv()
@@ -23,6 +25,13 @@ CORS(app)
 
 # Store sessions
 sessions = {}
+
+
+def save_to_file(session):
+    """Save collected user information to a text file."""
+    with open("user_input.txt", "a") as file:
+        file.write(json.dumps(session, indent=4) + "\n")
+
 
 def check_missing_info(session):
     missing_info = []
@@ -86,6 +95,8 @@ def handle_message():
         missing_info = check_missing_info(session)
         
         if not missing_info:
+            save_to_file(session)
+            main()
             return Response(
                 "Thank you! I have all the information I need. Is there anything else I can help you with?",
                 mimetype='text/plain'
