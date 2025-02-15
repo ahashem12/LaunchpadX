@@ -220,10 +220,8 @@ class AgenticRAG:
         prompt = (
             "You are an assistant for question-answering tasks. Use the following context to answer the question. "
             "If the context contains multiple numerical values for the same attribute (e.g., area values), sum them and provide the total. "
-            "If no answer is found locally and you are searching the web, include references. "
             "Then, on a new line, write FINAL_ANSWER: followed by the exact final value (or 'N/A').\n\n"
             "if you didnt find anything in the knowldege base seatch the web"
-            "No local data found. Searching the web for typical values and references. "
             "Include references in your final answer."
             f"{web_note}\n"
             f"Context:\n{context_text}\n\nQuestion:\n{query}"
@@ -431,12 +429,12 @@ class ExcelTemplateProcessor:
                 )
                 final_answer = self.parse_final_answer(response)
                 if not final_answer or final_answer.lower() in ["n/a", "i don't know", "no context provided", "no information provided"]:
-                    print(f"[WARN] No valid FINAL_ANSWER for {header} field {field_id}. Prompt user.")
-                    user_val = input(f"{question}")
+                    print(f"[WARN] No valid FINAL_ANSWER for {header} field {field_id}. Prompt user.\n")
+                    user_val = input(f"{question}\n")
                     cell.value = self.convert_value(user_val) if user_val.strip() else "N/A"
                 else:
                     cell.value = self.convert_value(final_answer)
-                print(f"[INFO] Yellow cell {field_id} set to '{cell.value}'.")
+                print(f"[INFO] Yellow cell {field_id} set to '{cell.value}'.\n\n")
 
     def fill_pink_cells_from_docs(self, max_fields=6):
         processed_fields = 0
@@ -461,12 +459,12 @@ class ExcelTemplateProcessor:
                 )
                 final_answer = self.parse_final_answer(response)
                 if not final_answer or final_answer.lower() in ["n/a", "i don't know", "no context provided", "no information provided"]:
-                    print(f"[WARN] No valid FINAL_ANSWER for {header} field {field_id}. Prompt user.")
-                    user_val = input(f"{question}")
+                    print(f"[WARN] No valid FINAL_ANSWER for {header} field {field_id}. Prompt user.\n")
+                    user_val = input(f"{question}\n")
                     cell.value = self.convert_value(user_val) if user_val.strip() else "N/A"
                 else:
                     cell.value = self.convert_value(final_answer)
-                print(f"[INFO] Pink cell {field_id} set to '{cell.value}'.")
+                print(f"[INFO] Pink cell {field_id} set to '{cell.value}'.\n\n")
 
     def save(self, output_file: str):
         self.workbook.save(output_file)
@@ -517,8 +515,8 @@ def main():
     llm_client = LLMClient(api_key=openai_key, system_prompt=system_prompt, model="gpt-4o-mini", temperature=0.3)
 
     processor = ExcelTemplateProcessor("financial_sheet.xlsx", llm_client, agentic_rag_customer, agentic_rag_global)
-    processor.fill_yellow_cells_from_docs(max_fields=6)
-    processor.fill_pink_cells_from_docs(max_fields=6)
+    # processor.fill_yellow_cells_from_docs(max_fields=6)
+    processor.fill_pink_cells_from_docs(max_fields=60)
     processor.save("processed_sheet.xlsx")
     print("[INFO] Starting chat interface...")
     chat_interface()
