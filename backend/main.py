@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from routers import api_router
+from database import Database
 
 app = FastAPI(
     title="Consulti API",
@@ -21,6 +23,20 @@ app.add_middleware(
 # Add Gzip compression
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+# Include main router
+app.include_router(api_router, prefix="/api/v1")
+
+@app.on_event("startup")
+async def startup_db_client():
+    await Database.connect_to_database()
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    await Database.close_database_connection()
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Consulti API"}
 
 if __name__ == "__main__":
     import uvicorn
