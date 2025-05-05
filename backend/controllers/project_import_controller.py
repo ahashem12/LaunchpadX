@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.project_import_model import ProjectImport
-from ..services.project_import_service import ProjectImportService
-from ..repositories.project_import_repository import ProjectImportRepository
+from models.project_import_model import ProjectImport
+from services.project_import_service import ProjectImportService
+from repositories.project_import_repository import ProjectImportRepository
 
 router = APIRouter()
 project_import_service = ProjectImportService(ProjectImportRepository())

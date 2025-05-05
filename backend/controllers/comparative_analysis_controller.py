@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.comparative_analysis_model import ComparativeAnalysis
-from ..services.comparative_analysis_service import ComparativeAnalysisService
-from ..repositories.comparative_analysis_repository import ComparativeAnalysisRepository
+from models.comparative_analysis_model import ComparativeAnalysis
+from services.comparative_analysis_service import ComparativeAnalysisService
+from repositories.comparative_analysis_repository import ComparativeAnalysisRepository
 
 router = APIRouter()
 comparative_analysis_service = ComparativeAnalysisService(ComparativeAnalysisRepository())
@@ -35,4 +35,4 @@ async def update_analysis(analysis_id: str, analysis: ComparativeAnalysis):
 
 @router.post("/generate/", response_model=ComparativeAnalysis)
 async def generate_analysis(project_ids: List[str], analysis_type: str):
-    return await comparative_analysis_service.generate_comparative_analysis(project_ids, analysis_type) 
+    return await comparative_analysis_service.generate_comparative_analysis(project_ids, analysis_type)

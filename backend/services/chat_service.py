@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.chat_model import ChatMessage, ChatSession
-from ..repositories.chat_repository import ChatRepository
+from models.chat_model import ChatMessage, ChatSession
+from repositories.chat_repository import ChatRepository
 
 class ChatService:
     def __init__(self, repository: ChatRepository):
@@ -46,4 +46,4 @@ class ChatService:
             user_id=user_id,
             messages=[]
         )
-        return await self.create_session(session) 
+        return await self.create_session(session)

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.program_model import Program
-from ..services.program_service import ProgramService
-from ..repositories.program_repository import ProgramRepository
+from models.program_model import Program
+from services.program_service import ProgramService
+from repositories.program_repository import ProgramRepository
 
 router = APIRouter()
 program_service = ProgramService(ProgramRepository())
@@ -20,4 +20,4 @@ async def get_program(program_id: str):
     program = await program_service.get_program_by_id(program_id)
     if not program:
         raise HTTPException(status_code=404, detail="Program not found")
-    return program 
+    return program

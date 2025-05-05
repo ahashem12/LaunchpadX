@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
-from ..services.dashboard_service import DashboardService
-from ..repositories.dashboard_repository import DashboardRepository
+from models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
+from services.dashboard_service import DashboardService
+from repositories.dashboard_repository import DashboardRepository
 
 router = APIRouter()
 dashboard_service = DashboardService(DashboardRepository())
@@ -75,4 +75,4 @@ async def update_layout(layout_id: str, layout: DashboardLayout):
 # Data generation endpoint
 @router.post("/generate-data/", response_model=DashboardData)
 async def generate_data(user_id: str, data_type: str):
-    return await dashboard_service.generate_dashboard_data(user_id, data_type) 
+    return await dashboard_service.generate_dashboard_data(user_id, data_type)

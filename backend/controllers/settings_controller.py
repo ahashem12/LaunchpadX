@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Any
-from ..models.settings_model import UserSettings, SystemSettings
-from ..services.settings_service import SettingsService
-from ..repositories.settings_repository import SettingsRepository
+from models.settings_model import UserSettings, SystemSettings
+from services.settings_service import SettingsService
+from repositories.settings_repository import SettingsRepository
 
 router = APIRouter()
 settings_service = SettingsService(SettingsRepository())

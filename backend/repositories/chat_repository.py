@@ -1,12 +1,12 @@
 from typing import List, Optional
-from ..models.chat_model import ChatMessage, ChatSession
-from ..database import get_database
+from models.chat_model import ChatMessage, ChatSession
+from database import get_database
 
 class ChatRepository:
     def __init__(self):
         self.db = get_database()
-        self.messages_collection = self.db.chat_messages
-        self.sessions_collection = self.db.chat_sessions
+        self.messages_collection = self.db
+        self.sessions_collection = self.db
 
     # Message methods
     async def create_message(self, message: ChatMessage) -> ChatMessage:
@@ -50,4 +50,4 @@ class ChatRepository:
         )
         if result.modified_count:
             return await self.get_session_by_id(session_id)
-        return None 
+        return None

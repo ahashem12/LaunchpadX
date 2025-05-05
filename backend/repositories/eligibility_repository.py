@@ -1,12 +1,12 @@
 from typing import List, Optional
-from ..models.eligibility_model import EligibilityCriteria, EligibilityResult
-from ..database import get_database
+from models.eligibility_model import EligibilityCriteria, EligibilityResult
+from database import get_database
 
 class EligibilityRepository:
     def __init__(self):
         self.db = get_database()
-        self.criteria_collection = self.db.eligibility_criteria
-        self.results_collection = self.db.eligibility_results
+        self.criteria_collection = self.db
+        self.results_collection = self.db
 
     # Criteria methods
     async def create_criteria(self, criteria: EligibilityCriteria) -> EligibilityCriteria:
@@ -50,4 +50,4 @@ class EligibilityRepository:
 
     async def get_results_by_program(self, program_id: str) -> List[EligibilityResult]:
         results = await self.results_collection.find({"program_id": program_id}).to_list(length=None)
-        return [EligibilityResult(**result) for result in results] 
+        return [EligibilityResult(**result) for result in results]

@@ -1,11 +1,11 @@
 from typing import List, Optional
-from ..models.project_import_model import ProjectImport
-from ..database import get_database
+from models.project_import_model import ProjectImport
+from database import get_database
 
 class ProjectImportRepository:
     def __init__(self):
         self.db = get_database()
-        self.collection = self.db.project_imports
+        self.collection = self.db
 
     async def create(self, project_import: ProjectImport) -> ProjectImport:
         project_import_dict = project_import.dict()
@@ -34,4 +34,4 @@ class ProjectImportRepository:
         )
         if result.modified_count:
             return await self.get_by_id(import_id)
-        return None 
+        return None

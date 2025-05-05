@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.recommendation_model import Recommendation
-from ..repositories.recommendation_repository import RecommendationRepository
+from models.recommendation_model import Recommendation
+from repositories.recommendation_repository import RecommendationRepository
 
 class RecommendationService:
     def __init__(self, repository: RecommendationRepository):
@@ -42,4 +42,4 @@ class RecommendationService:
             program_id=program_id,
             recommendations=recommendations
         )
-        return await self.create_recommendation(recommendation) 
+        return await self.create_recommendation(recommendation)

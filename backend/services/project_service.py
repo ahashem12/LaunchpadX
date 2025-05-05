@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.project_model import Project
-from ..repositories.project_repository import ProjectRepository
+from models.project_model import Project
+from repositories.project_repository import ProjectRepository
 
 class ProjectService:
     def __init__(self, repository: ProjectRepository):
@@ -22,4 +22,4 @@ class ProjectService:
         return await self.repository.update(project_id, project)
 
     async def delete_project(self, project_id: str) -> bool:
-        return await self.repository.delete(project_id) 
+        return await self.repository.delete(project_id)

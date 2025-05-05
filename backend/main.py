@@ -28,7 +28,11 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.on_event("startup")
 async def startup_db_client():
-    await Database.connect_to_database()
+    try:
+        await Database.connect_to_database()
+    except Exception as e:
+        print(f"❌ Failed to connect to the database: {e}")
+    
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

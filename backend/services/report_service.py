@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.report_model import Report, ReportTemplate
-from ..repositories.report_repository import ReportRepository
+from models.report_model import Report, ReportTemplate
+from repositories.report_repository import ReportRepository
 
 class ReportService:
     def __init__(self, repository: ReportRepository):
@@ -70,4 +70,4 @@ class ReportService:
             project_id=project_id,
             program_id=program_id
         )
-        return await self.create_report(report) 
+        return await self.create_report(report)

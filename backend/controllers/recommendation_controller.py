@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.recommendation_model import Recommendation
-from ..services.recommendation_service import RecommendationService
-from ..repositories.recommendation_repository import RecommendationRepository
+from models.recommendation_model import Recommendation
+from services.recommendation_service import RecommendationService
+from repositories.recommendation_repository import RecommendationRepository
 
 router = APIRouter()
 recommendation_service = RecommendationService(RecommendationRepository())
@@ -35,4 +35,4 @@ async def update_recommendation(recommendation_id: str, recommendation: Recommen
 
 @router.post("/generate/", response_model=Recommendation)
 async def generate_recommendations(project_id: str, program_id: str):
-    return await recommendation_service.generate_recommendations(project_id, program_id) 
+    return await recommendation_service.generate_recommendations(project_id, program_id)

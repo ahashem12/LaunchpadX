@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.program_model import Program
-from ..repositories.program_repository import ProgramRepository
+from models.program_model import Program
+from repositories.program_repository import ProgramRepository
 
 class ProgramService:
     def __init__(self, repository: ProgramRepository):

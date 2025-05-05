@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.chat_model import ChatMessage, ChatSession
-from ..services.chat_service import ChatService
-from ..repositories.chat_repository import ChatRepository
+from models.chat_model import ChatMessage, ChatSession
+from services.chat_service import ChatService
+from repositories.chat_repository import ChatRepository
 
 router = APIRouter()
 chat_service = ChatService(ChatRepository())
@@ -53,4 +53,4 @@ async def process_message(user_id: str, message: str):
 
 @router.post("/start-session/", response_model=ChatSession)
 async def start_session(user_id: str):
-    return await chat_service.start_session(user_id) 
+    return await chat_service.start_session(user_id)

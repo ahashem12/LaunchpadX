@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
-from ..repositories.dashboard_repository import DashboardRepository
+from models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
+from repositories.dashboard_repository import DashboardRepository
 
 class DashboardService:
     def __init__(self, repository: DashboardRepository):
@@ -64,4 +64,4 @@ class DashboardService:
             data_type=data_type,
             data=data
         )
-        return await self.create_data(dashboard_data) 
+        return await self.create_data(dashboard_data)

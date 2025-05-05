@@ -1,11 +1,11 @@
 from typing import List, Optional
-from ..models.project_model import Project
-from ..database import get_database
+from models.project_model import Project
+from database import get_database
 
 class ProjectRepository:
     def __init__(self):
         self.db = get_database()
-        self.collection = self.db.projects
+        self.collection = self.db
 
     async def create(self, project: Project) -> Project:
         project_dict = project.dict()
@@ -39,4 +39,4 @@ class ProjectRepository:
 
     async def delete(self, project_id: str) -> bool:
         result = await self.collection.delete_one({"_id": project_id})
-        return result.deleted_count > 0 
+        return result.deleted_count > 0

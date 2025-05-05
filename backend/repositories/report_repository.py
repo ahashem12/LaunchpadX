@@ -1,12 +1,12 @@
 from typing import List, Optional
-from ..models.report_model import Report, ReportTemplate
-from ..database import get_database
+from models.report_model import Report, ReportTemplate
+from database import get_database
 
 class ReportRepository:
     def __init__(self):
         self.db = get_database()
-        self.reports_collection = self.db.reports
-        self.templates_collection = self.db.report_templates
+        self.reports_collection = self.db
+        self.templates_collection = self.db
 
     # Report methods
     async def create_report(self, report: Report) -> Report:
@@ -68,4 +68,4 @@ class ReportRepository:
         )
         if result.modified_count:
             return await self.get_template_by_id(template_id)
-        return None 
+        return None

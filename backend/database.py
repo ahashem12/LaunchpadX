@@ -1,27 +1,28 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
 import os
+import asyncpg
 
 class Database:
-    client: Optional[AsyncIOMotorClient] = None
+    pool: Optional[asyncpg.Pool] = None
 
     @classmethod
     async def connect_to_database(cls):
-        if cls.client is None:
-            cls.client = AsyncIOMotorClient(os.getenv("MONGODB_URL", "mongodb://localhost:27017"))
-            cls.db = cls.client.consulti_db
+        if cls.pool is None:
+            cls.pool = await asyncpg.create_pool(
+                dsn=os.getenv("POSTGRES_URL", "postgresql://user:password@localhost:5432/consulti_db")
+            )
 
     @classmethod
     async def close_database_connection(cls):
-        if cls.client is not None:
-            cls.client.close()
-            cls.client = None
+        if cls.pool is not None:
+            await cls.pool.close()
+            cls.pool = None
 
     @classmethod
     def get_database(cls):
-        if cls.client is None:
-            raise Exception("Database not connected")
-        return cls.db
+        if cls.pool is None:
+            print("Database not connected")
+        return cls.pool
 
-async def get_database():
-    return Database.get_database() 
+def get_database():
+    return Database.get_database()

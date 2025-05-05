@@ -1,11 +1,11 @@
 from typing import List, Optional
-from ..models.program_model import Program
-from ..database import get_database
+from models.program_model import Program
+from database import get_database
 
 class ProgramRepository:
     def __init__(self):
         self.db = get_database()
-        self.collection = self.db.programs
+        self.collection = self.db
 
     async def create(self, program: Program) -> Program:
         program_dict = program.dict()
@@ -35,4 +35,4 @@ class ProgramRepository:
 
     async def delete(self, program_id: str) -> bool:
         result = await self.collection.delete_one({"_id": program_id})
-        return result.deleted_count > 0 
+        return result.deleted_count > 0

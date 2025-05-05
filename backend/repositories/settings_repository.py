@@ -1,12 +1,12 @@
 from typing import List, Optional, Any
-from ..models.settings_model import UserSettings, SystemSettings
-from ..database import get_database
+from models.settings_model import UserSettings, SystemSettings
+from database import get_database
 
 class SettingsRepository:
     def __init__(self):
         self.db = get_database()
-        self.user_settings_collection = self.db.user_settings
-        self.system_settings_collection = self.db.system_settings
+        self.user_settings_collection = self.db
+        self.system_settings_collection = self.db
 
     # User settings methods
     async def create_user_settings(self, settings: UserSettings) -> UserSettings:
@@ -59,4 +59,4 @@ class SettingsRepository:
 
     async def delete_system_setting(self, key: str) -> bool:
         result = await self.system_settings_collection.delete_one({"key": key})
-        return result.deleted_count > 0 
+        return result.deleted_count > 0

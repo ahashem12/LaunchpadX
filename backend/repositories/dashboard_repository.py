@@ -1,13 +1,13 @@
 from typing import List, Optional
-from ..models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
-from ..database import get_database
+from models.dashboard_model import DashboardData, DashboardWidget, DashboardLayout
+from database import get_database
 
 class DashboardRepository:
     def __init__(self):
         self.db = get_database()
-        self.data_collection = self.db.dashboard_data
-        self.widget_collection = self.db.dashboard_widgets
-        self.layout_collection = self.db.dashboard_layouts
+        self.data_collection = self.db
+        self.widget_collection = self.db
+        self.layout_collection = self.db
 
     # Data methods
     async def create_data(self, data: DashboardData) -> DashboardData:
@@ -84,4 +84,4 @@ class DashboardRepository:
         )
         if result.modified_count:
             return await self.get_layout_by_user(layout.user_id)
-        return None 
+        return None

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
-from ..models.report_model import Report, ReportTemplate
-from ..services.report_service import ReportService
-from ..repositories.report_repository import ReportRepository
+from models.report_model import Report, ReportTemplate
+from services.report_service import ReportService
+from repositories.report_repository import ReportRepository
 
 router = APIRouter()
 report_service = ReportService(ReportRepository())

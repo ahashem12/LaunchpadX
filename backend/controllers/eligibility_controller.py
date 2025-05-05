@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from ..models.eligibility_model import EligibilityCriteria, EligibilityResult
-from ..services.eligibility_service import EligibilityService
-from ..repositories.eligibility_repository import EligibilityRepository
+from models.eligibility_model import EligibilityCriteria, EligibilityResult
+from services.eligibility_service import EligibilityService
+from repositories.eligibility_repository import EligibilityRepository
 
 router = APIRouter()
 eligibility_service = EligibilityService(EligibilityRepository())
@@ -47,4 +47,4 @@ async def get_results_by_project(project_id: str):
 
 @router.get("/results/program/{program_id}", response_model=List[EligibilityResult])
 async def get_results_by_program(program_id: str):
-    return await eligibility_service.get_results_by_program(program_id) 
+    return await eligibility_service.get_results_by_program(program_id)

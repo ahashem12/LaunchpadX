@@ -1,6 +1,6 @@
 from typing import List, Optional, Any, Dict
-from ..models.settings_model import UserSettings, SystemSettings
-from ..repositories.settings_repository import SettingsRepository
+from models.settings_model import UserSettings, SystemSettings
+from repositories.settings_repository import SettingsRepository
 
 class SettingsService:
     def __init__(self, repository: SettingsRepository):
@@ -65,4 +65,4 @@ class SettingsService:
             user_id=user_id,
             settings=settings_dict
         )
-        return await self.update_user_settings(user_id, updated_settings) 
+        return await self.update_user_settings(user_id, updated_settings)

@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.project_import_model import ProjectImport
-from ..repositories.project_import_repository import ProjectImportRepository
+from models.project_import_model import ProjectImport
+from repositories.project_import_repository import ProjectImportRepository
 
 class ProjectImportService:
     def __init__(self, repository: ProjectImportRepository):
@@ -19,4 +19,4 @@ class ProjectImportService:
         return await self.repository.get_by_project_id(project_id)
 
     async def update_import_status(self, import_id: str, status: str) -> Optional[ProjectImport]:
-        return await self.repository.update_status(import_id, status) 
+        return await self.repository.update_status(import_id, status)

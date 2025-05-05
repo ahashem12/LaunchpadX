@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.comparative_analysis_model import ComparativeAnalysis
-from ..repositories.comparative_analysis_repository import ComparativeAnalysisRepository
+from models.comparative_analysis_model import ComparativeAnalysis
+from repositories.comparative_analysis_repository import ComparativeAnalysisRepository
 
 class ComparativeAnalysisService:
     def __init__(self, repository: ComparativeAnalysisRepository):
@@ -47,4 +47,4 @@ class ComparativeAnalysisService:
             analysis_type=analysis_type,
             results=results
         )
-        return await self.create_analysis(analysis) 
+        return await self.create_analysis(analysis)

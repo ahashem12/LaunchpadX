@@ -1,6 +1,6 @@
 from typing import List, Optional
-from ..models.eligibility_model import EligibilityCriteria, EligibilityResult
-from ..repositories.eligibility_repository import EligibilityRepository
+from models.eligibility_model import EligibilityCriteria, EligibilityResult
+from repositories.eligibility_repository import EligibilityRepository
 
 class EligibilityService:
     def __init__(self, repository: EligibilityRepository):
@@ -45,4 +45,4 @@ class EligibilityService:
             is_eligible=is_eligible,
             reasons=reasons
         )
-        return await self.create_result(result) 
+        return await self.create_result(result)

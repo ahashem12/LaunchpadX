@@ -1,11 +1,11 @@
 from typing import List, Optional
-from ..models.recommendation_model import Recommendation
-from ..database import get_database
+from models.recommendation_model import Recommendation
+from database import get_database
 
 class RecommendationRepository:
     def __init__(self):
         self.db = get_database()
-        self.collection = self.db.recommendations
+        self.collection = self.db
 
     async def create(self, recommendation: Recommendation) -> Recommendation:
         recommendation_dict = recommendation.dict()
@@ -35,4 +35,4 @@ class RecommendationRepository:
         )
         if result.modified_count:
             return await self.get_by_id(recommendation_id)
-        return None 
+        return None

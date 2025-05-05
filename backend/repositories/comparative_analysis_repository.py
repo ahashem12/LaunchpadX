@@ -1,11 +1,11 @@
 from typing import List, Optional
-from ..models.comparative_analysis_model import ComparativeAnalysis
-from ..database import get_database
+from models.comparative_analysis_model import ComparativeAnalysis
+from database import get_database
 
 class ComparativeAnalysisRepository:
     def __init__(self):
         self.db = get_database()
-        self.collection = self.db.comparative_analyses
+        self.collection = self.db
 
     async def create(self, analysis: ComparativeAnalysis) -> ComparativeAnalysis:
         analysis_dict = analysis.dict()
@@ -35,4 +35,4 @@ class ComparativeAnalysisRepository:
         )
         if result.modified_count:
             return await self.get_by_id(analysis_id)
-        return None 
+        return None
