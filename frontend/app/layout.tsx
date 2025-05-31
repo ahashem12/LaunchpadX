@@ -1,5 +1,15 @@
-import Footer from "@/components/footer"
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "Consulti - AI-Powered Project Management",
+  description: "Simplify your project management with Consulti, an AI-powered consultant for your projects.",
+  generator: "v0.dev",
+}
 
 export default function RootLayout({
   children,
@@ -8,12 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
-        <Footer />
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
