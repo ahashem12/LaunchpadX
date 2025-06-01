@@ -1,4 +1,3 @@
-// services/projects/types.ts
 import type { Project, TeamMember } from "@/types"
 
 export interface ProjectCreateInput {

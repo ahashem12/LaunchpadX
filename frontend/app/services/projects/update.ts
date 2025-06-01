@@ -1,4 +1,3 @@
-// services/projects/update.ts
 import { createClient } from "@/lib/supabase/client"
 import type { ProjectUpdateInput } from "./types"
 

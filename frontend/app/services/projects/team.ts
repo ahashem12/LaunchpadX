@@ -1,4 +1,3 @@
-// services/projects/team.ts
 import { createClient } from "@/lib/supabase/client"
 import type { TeamMember } from "@/types"
 

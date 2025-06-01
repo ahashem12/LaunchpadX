@@ -1,4 +1,3 @@
-// services/projects/create.ts
 import { createClient } from "@/lib/supabase/client"
 import type { Project } from "@/types"
 import type { ProjectCreateInput } from "./types"

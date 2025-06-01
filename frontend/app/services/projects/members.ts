@@ -1,4 +1,3 @@
-// services/projects/members.ts
 import { createClient } from "@/lib/supabase/client"
 
 export async function hasProjectAccess(projectId: string): Promise<boolean> {

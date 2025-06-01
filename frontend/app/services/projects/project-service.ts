@@ -1,4 +1,3 @@
-// services/projects/project-service.ts
 import { createProject } from "./create"
 import { getProject, getUserProjects } from "./read"
 import { updateProject } from "./update"
