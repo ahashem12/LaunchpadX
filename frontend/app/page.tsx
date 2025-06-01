@@ -1,38 +1,62 @@
-import { Building2, Brain, Rocket, BarChart3 } from "lucide-react";
-import Link from "next/link";
-import Roadmap from "@/components/home/Roadmap";
-import Team from "@/components/home/Team";
-import Features from "@/components/home/features/Features";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { WatermelonIcon } from "@/components/icons/WatermelonIcon" // Import your SVG component
+
 export default function Home() {
   return (
-    <div className="flex-1 flex flex-col">
-      <main className="min-h-auto bg-gradient-to-b from-slate-50 to-white">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-950 text-white py-16">
-          <div className="container mx-auto px-4">
-            <h1 className="text-5xl font-bold text-center mb-6">
-              Your AI-Powered Business Advisor
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="w-full border-b border-border">
+        <div className="container flex h-16 items-center justify-between px-4">
+          <Link href="/" className="flex items-center gap-2">
+            <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+            <span className="text-xl font-bold text-white">Consulti</span>
+          </Link>
+          <nav className="flex items-center gap-4">
+            <Link href="/login">
+              <Button variant="ghost" className="text-white">
+                Log In
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="outline" className="text-white border-white">
+                Sign Up
+              </Button>
+            </Link>
+          </nav>
+        </div>
+      </header>
+      <main className="flex-1 flex">
+        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-24">
+          <div className="max-w-[600px]">
+            <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
+              Simplify Your Project Management
             </h1>
-            <p className="text-xl text-center mb-8 text-blue-100 max-w-3xl mx-auto">
-              Get instant, data-driven insights and expert consultation for your
-              business at a fraction of traditional consulting costs.
+            <p className="mt-4 text-lg text-gray-400 max-w-[550px]">
+              Consulti helps you manage your projects, teams, and agreements in one place. Get started today.
             </p>
-            <div className="flex justify-center">
-              <Link
-                href="/chat"
-                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors duration-300 shadow-lg"
-              >
-                Start Consulting Now
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <Link href="/signup">
+                <Button
+                  size="lg"
+                  className="bg-watermelon-green hover:bg-watermelon-green/90 text-white w-full sm:w-auto"
+                >
+                  Get Started
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button size="lg" variant="outline" className="border-gray-700 text-white w-full sm:w-auto">
+                  Log In
+                </Button>
               </Link>
             </div>
           </div>
         </div>
-
-        {/* Features Section */}
-        <Features />
-        <Roadmap />
-        <Team />
+        <div className="hidden lg:block lg:w-[40%] bg-gradient-to-br from-blue-500 to-purple-600 relative">
+          <div className="absolute bottom-1/4 right-1/4">
+            <WatermelonIcon size={180} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+          </div>
+        </div>
       </main>
     </div>
-  );
+  )
 }
