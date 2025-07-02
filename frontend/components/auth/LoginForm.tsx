@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -19,28 +18,20 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [debugInfo, setDebugInfo] = useState<string | null>(null)
 
-  // Debug function to check cookies
-  const checkCookies = () => {
-    if (typeof document !== "undefined") {
-      return document.cookie
-    }
-    return "No cookies available"
-  }
+  // Check if in development mode
+  const isDev = process.env.NODE_ENV === 'development'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-    setDebugInfo(null)
+    isDev && setDebugInfo(null) // Only clear in dev
 
     try {
-      // Check for hardcoded credentials
       if (email === "example@example.com" && password === "password") {
-        // Set a cookie for mock authentication
         document.cookie = "mock_auth=true; path=/; max-age=86400"
-        setDebugInfo("Using mock authentication. Redirecting to dashboard...")
+        isDev && setDebugInfo("Using mock authentication. Redirecting to dashboard...")
 
-        // Small delay to show debug info
         setTimeout(() => {
           router.push("/dashboard")
         }, 500)
@@ -48,34 +39,30 @@ export function LoginForm() {
       }
 
       const supabase = createClient()
+      isDev && setDebugInfo("Attempting Supabase authentication...")
 
-      // Log before authentication attempt
-      setDebugInfo("Attempting Supabase authentication...")
-
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) {
-        setError(error.message)
-        setDebugInfo(`Authentication error: ${error.message}`)
+      if (authError) {
+        setError(authError.message)
+        isDev && setDebugInfo(`Authentication error: ${authError.message}`)
         return
       }
 
-      // Log after successful authentication
-      setDebugInfo(
-        `Authentication successful. User: ${data.user?.email}. Cookies: ${checkCookies()}. Redirecting to dashboard...`,
+      isDev && setDebugInfo(
+        `Authentication successful. User: ${data.user?.email}. Redirecting to dashboard...`,
       )
 
-      // Small delay to show debug info
       setTimeout(() => {
         router.push("/dashboard")
         router.refresh()
       }, 1000)
     } catch (error: any) {
       setError("An unexpected error occurred")
-      setDebugInfo(`Unexpected error: ${error.message || "Unknown error"}`)
+      isDev && setDebugInfo(`Unexpected error: ${error.message || "Unknown error"}`)
     } finally {
       setIsLoading(false)
     }
@@ -125,10 +112,12 @@ export function LoginForm() {
               className="bg-[#121212] border-[#2A2A2A] text-white"
             />
           </div>
-          {error && <div className="text-sm text-red-500">{error}</div>}
-          {debugInfo && (
-            <div className="text-xs text-gray-400 p-2 bg-gray-800 rounded mt-2 overflow-auto max-h-24">{debugInfo}</div>
-          )}
+      {error && <div className="text-sm text-red-500">{error}</div>}
+      {isDev && debugInfo && (
+        <div className="text-xs text-gray-400 p-2 bg-gray-800 rounded mt-2 overflow-auto max-h-24">
+          {debugInfo}
+        </div>
+      )}
 
           <Button
             type="submit"
