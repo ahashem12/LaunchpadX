@@ -67,83 +67,6 @@ export const mockProjects: Project[] = [
   },
 ]
 
-// Add these functions to your mock-data.ts file
-
-// Function to delete a next step by ID
-export function getNextStepsByProjectId(projectId: string): NextStep[] {
-  return mockSteps.filter((step) => step.project_id === projectId)
-}
-
-// Function to delete a next step by ID
-export function deleteNextStep(id: string): boolean {
-  const initialLength = mockSteps.length
-  mockSteps = mockSteps.filter(step => step.id !== id)
-  return mockSteps.length < initialLength
-}
-
-export let mockSteps: NextStep[] = [
-  {
-    id: "1",
-    done: true, 
-    title: "Find a name for your project and add a logo",
-    description:
-      "A strong project name and logo helps establish your brand identity and makes your project more recognizable in the community.",
-    buttonText: "Edit Project Name & Logo",
-    priority: 1,
-    project_id: "1",
-    created_at: "2023-01-15T10:00:00Z",
-    updated_at: "2023-01-16T10:00:00Z",
-  },
-  {
-    id: "2",
-    done: true,
-    title: "Find a co-founder to share your journey with",
-    description:
-      "Having a co-founder brings complementary skills, shared responsibilities, and moral support during challenging times.",
-    buttonText: "Manage Team",
-    priority: 2,
-    project_id: "1",
-    created_at: "2023-01-15T10:00:00Z",
-    updated_at: "2023-01-20T14:30:00Z",
-  },
-  {
-    id: "3",
-    done: true,
-    title: "Describe your idea to the community. Provide details on key features, benefits and progress.",
-    description:
-      "A clear description helps potential contributors, investors, and users understand your project's value proposition and current state.",
-    buttonText: "Add Project Description",
-    priority: 3,
-    project_id: "1",
-    created_at: "2023-01-15T10:00:00Z",
-    updated_at: "2023-01-15T10:00:00Z",
-  },
-  {
-    id: "4",
-    done: false,
-    title: "Empower your team! Make one of your team members an admin, so they can also manage the project.",
-    description:
-      "Delegating admin privileges allows team members to contribute more effectively and reduces bottlenecks in project management.",
-    buttonText: "Manage Team Permissions",
-    priority: 4,
-    project_id: "1",
-    created_at: "2023-01-15T10:00:00Z",
-    updated_at: "2023-01-15T10:00:00Z",
-  },
-  {
-    id: "5",
-    done: false,
-    title: "Update your project's visual identity by uploading a professional banner.",
-    description:
-      "A professional banner enhances your project's presentation and creates a more polished impression for visitors.",
-    buttonText: "Upload Banner",
-    priority: 5,
-    project_id: "1",
-    created_at: "2023-01-15T10:00:00Z",
-    updated_at: "2023-01-15T10:00:00Z",
-  },
-]
-
 export const mockTeamMembers: TeamMember[] = [
   {
     id: "tm-1",
@@ -175,10 +98,6 @@ export const mockTeamMembers: TeamMember[] = [
 export function getAllProjects(): Project[] {
   return mockProjects
 }
-
-// Function to get all next steps
-// (Removed duplicate implementation)
-
 // Function to get a project by ID
 export function getProjectById(id: string): Project | undefined {
   return mockProjects.find((project) => project.id === id)
@@ -201,7 +120,4 @@ export function getTeamMembersByProjectId(projectId: string): TeamMember[] {
 // Function to get a team member by ID
 export function getTeamMemberById(id: string): TeamMember | undefined {
   return mockTeamMembers.find((member) => member.id === id)
-}
-export function getAllNextSteps(): NextStep[] {
-  return mockSteps; // Just return all steps without filtering
 }
