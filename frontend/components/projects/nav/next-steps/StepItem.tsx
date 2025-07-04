@@ -1,4 +1,4 @@
-// components/projects/nav/next-steps/StepItem.tsx
+// frontend/components/projects/nav/next-steps/StepItem.tsx
 "use client"
 
 import type React from "react"
@@ -17,7 +17,7 @@ export function StepItem({ done, title, isExpanded = false, onToggle, children }
   return (
     <div
       className={cn(
-        "mb-4 rounded-lg border",
+        "mb-4 rounded-lg border overflow-hidden",
         done ? "border-l-4 border-l-green-500" : "border-l-4 border-l-red-500",
       )}
     >
@@ -52,7 +52,15 @@ export function StepItem({ done, title, isExpanded = false, onToggle, children }
         </div>
         <ChevronDown className={cn("h-5 w-5 text-gray-400 transition-transform", isExpanded && "rotate-180")} />
       </div>
-      {isExpanded && children && <div className="px-4 pb-4 pt-0">{children}</div>}
+      
+      <div className={cn(
+        "grid transition-all duration-300 ease-in-out",
+        isExpanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      )}>
+        <div className="overflow-hidden">
+          {children && <div className="px-4 pb-4 pt-0">{children}</div>}
+        </div>
+      </div>
     </div>
   )
 }

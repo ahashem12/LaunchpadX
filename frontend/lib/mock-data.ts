@@ -67,7 +67,21 @@ export const mockProjects: Project[] = [
   },
 ]
 
-export const mockSteps: NextStep[] = [
+// Add these functions to your mock-data.ts file
+
+// Function to delete a next step by ID
+export function getNextStepsByProjectId(projectId: string): NextStep[] {
+  return mockSteps.filter((step) => step.project_id === projectId)
+}
+
+// Function to delete a next step by ID
+export function deleteNextStep(id: string): boolean {
+  const initialLength = mockSteps.length
+  mockSteps = mockSteps.filter(step => step.id !== id)
+  return mockSteps.length < initialLength
+}
+
+export let mockSteps: NextStep[] = [
   {
     id: "1",
     done: true, 
@@ -164,11 +178,6 @@ export function getAllProjects(): Project[] {
 
 // Function to get all next steps
 // (Removed duplicate implementation)
-
-// Function to get next steps by project ID
-export function getNextStepsByProjectId(projectId: string): NextStep[] {
-  return mockSteps.filter((step) => step.project_id === projectId)
-}
 
 // Function to get a project by ID
 export function getProjectById(id: string): Project | undefined {

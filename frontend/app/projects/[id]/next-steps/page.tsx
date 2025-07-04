@@ -1,7 +1,7 @@
 // app/projects/[id]/next-steps/page.tsx
 import { StepsHeader, NextStepsList } from "@/components/projects/nav/next-steps"
 import { ProjectNav } from "@/components/projects/nav/ProjectNav"
-import { getAllNextSteps } from "@/lib/mock-data"
+import { getAllNextSteps, getNextStepsByProjectId } from "@/lib/mock-data"
 
 interface NextStepsPageProps {
   params: { id: string }
@@ -9,7 +9,6 @@ interface NextStepsPageProps {
 
 export default async function NextStepsPage( props: NextStepsPageProps) {
   const params = await props.params
-  // Get all steps without filtering by project ID
   const nextSteps = getAllNextSteps()
 
   return (
