@@ -87,8 +87,6 @@ export interface NextStep {
   title: string
   description?: string
   done: boolean
-  priority: number
-  buttonText: string
   project_id: string
   created_at?: string
   updated_at?: string
