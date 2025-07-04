@@ -23,6 +23,7 @@ export default async function DetailsPage(props: DetailsPageProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-6">
+        {/* <ProjectBanner bannerUrl={project.banner_url} /> */}
         <ProjectHeader project={project} />
       </div>
 
