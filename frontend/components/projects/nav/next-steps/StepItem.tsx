@@ -86,7 +86,6 @@ export function StepItem({
               <motion.div
                 animate={{ 
                   color: step.done ? "#9CA3AF" : "#FFFFFF",
-                  textDecoration: step.done ? "line-through" : "none"
                 }}
                 transition={{ duration: 0.3 }}
                 className="text-xs uppercase font-medium"
@@ -96,7 +95,6 @@ export function StepItem({
               <motion.div
                 animate={{ 
                   color: step.done ? "#9CA3AF" : "#FFFFFF",
-                  textDecoration: step.done ? "line-through" : "none"
                 }}
                 transition={{ duration: 0.3 }}
                 className="font-medium"
