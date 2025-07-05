@@ -3,10 +3,8 @@
 import { useState } from "react"
 import { AlertCards } from "./AlertCards"
 import { CreateRoleModal } from "./CreateRoleModal/CreateRoleModal"
-import { InvitationLinkCard } from "./InvitationLinkCard"
 import { RecommendedRolesTable } from "./RecommendedRolesTable"
 import { RoleFilterBadges } from "./RoleFilterBadges"
-import { TeamHeader } from "./TeamHeader"
 import { TeamMembersTable } from "./TeamMembersTable"
 import { getAllTeamMembers } from "@/lib/mock-data"
 
@@ -16,8 +14,6 @@ export function TeamRoles() {
 
   return (
     <div className="space-y-8">
-      <TeamHeader />
-      <InvitationLinkCard />
       <RoleFilterBadges onCreateRoleClick={() => setIsCreateRoleModalOpen(true)} />
       <TeamMembersTable teamMembers={teamMembers} />
       <AlertCards />
