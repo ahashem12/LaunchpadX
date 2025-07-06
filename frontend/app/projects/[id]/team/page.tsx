@@ -4,6 +4,7 @@ import { ProjectNav } from "@/components/projects/nav/ProjectNav"
 import { TeamRoles } from "@/components/projects/nav/team/TeamRoles"
 import { TeamMembersTable } from "@/components/projects/nav/team/TeamMembersTable"
 import { TeamHeader } from "@/components/projects/nav/team/TeamHeader"
+import { InvitationLinkCard } from "@/components/projects/nav/team/InvitationLinkCard"
 
 interface TeamPageProps {
   params: {
@@ -28,6 +29,8 @@ export default async function TeamPage(props: TeamPageProps) {
 
       <div className="mt-8 space-y-8">
         <TeamHeader />
+        <InvitationLinkCard />
+        
 
         {/* Display team members */}
         <div className="mb-8">
