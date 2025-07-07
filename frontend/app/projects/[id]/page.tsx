@@ -28,8 +28,8 @@ export default async function DetailsPage(props: DetailsPageProps) {
 
       <ProjectNav projectId={params.id} />
       <ProjectDescription description={project.description} />
-
-        <ProjectNextSteps />
+      <ProjectMedia />
+      <ProjectNextSteps />
     </div>
   )
 }
