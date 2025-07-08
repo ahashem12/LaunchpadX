@@ -4,44 +4,110 @@ import { FileText, Download, Eye, Sparkles } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UploadButton } from "./UploadButton"
-import type { Document } from "@/types"
+import type { PredefinedDocument } from "@/types/documents"
 import { toast } from "sonner"
+import { DocumentService } from "@/app/services/document/document-service"
+import { useState, useEffect } from "react"
 
-interface DocumentCard {
-  document: Document
+interface DocumentCardProps {
+  document: PredefinedDocument
+  projectId: string
+  onUploadSuccess?: () => void
 }
 
-export function DocumentCard({ document }: DocumentCard) {
-  const handleUpload = async (file: File) => {
-    // TODO: Implement Supabase upload
-    console.log("Uploading file:", file.name, "for document:", document.name)
+export function DocumentCard({ document, projectId, onUploadSuccess }: DocumentCardProps) {
+  const [uploadedDoc, setUploadedDoc] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+  useEffect(() => {
+    loadDocument()
+  }, [document.name, projectId])
 
-    // In the future, this will upload to Supabase Storage
-    // const { data, error } = await supabase.storage
-    //   .from('documents')
-    //   .upload(`${document.project_id}/${document.id}/${file.name}`, file)
+  const loadDocument = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const doc = await DocumentService.getDocumentByTitle(projectId, document.name)
+      setUploadedDoc(doc)
+    } catch (error) {
+      console.error("Failed to load document:", error)
+      setError(error instanceof Error ? error.message : "Failed to load document")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUploadSuccess = (uploadedDocument: any) => {
+    setUploadedDoc(uploadedDocument)
+    setError(null)
+    if (onUploadSuccess) {
+      onUploadSuccess()
+    }
   }
 
   const handleGenerateWithAI = () => {
     toast.info(`Generating ${document.name} with AI...`)
-    // TODO: Implement AI generation
   }
 
   const handleView = () => {
-    toast.info(`Opening ${document.name}...`)
-    // TODO: Implement document viewing
+    if (uploadedDoc?.file_url) {
+      window.open(uploadedDoc.file_url, "_blank")
+    }
   }
 
-  const handleDownload = () => {
-    toast.info(`Downloading ${document.name}...`)
-    // TODO: Implement document download
+  const handleDownload = async () => {
+    if (uploadedDoc?.file_url && uploadedDoc?.file_name) {
+      try {
+        const isPrivate = uploadedDoc.privacy === "private"
+        await DocumentService.downloadFile(uploadedDoc.file_url, uploadedDoc.file_name, isPrivate)
+        toast.success(`Downloaded ${document.name}`)
+      } catch (error) {
+        console.error("Download error:", error)
+        toast.error(error instanceof Error ? error.message : "Download failed")
+      }
+    }
   }
 
-  // Check if document has been uploaded (for demo, we'll use document.url)
-  const hasDocument = document.url && document.url !== ""
+  const hasDocument = uploadedDoc && uploadedDoc.file_url
+
+  if (isLoading) {
+    return (
+      <Card className="border-border bg-card">
+        <CardContent className="p-4">
+          <div className="animate-pulse">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-full bg-muted">
+                <div className="h-5 w-5 bg-gray-300 rounded"></div>
+              </div>
+              <div>
+                <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card className="border-border bg-card border-red-200">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-full bg-red-100">
+              <FileText className="h-5 w-5 text-red-500" />
+            </div>
+            <div>
+              <h4 className="font-medium text-foreground">{document.name}</h4>
+              <p className="text-xs text-red-500">Error: {error}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="border-border bg-card hover:bg-card/80 transition-colors">
@@ -53,12 +119,11 @@ export function DocumentCard({ document }: DocumentCard) {
             </div>
             <div>
               <h4 className="font-medium text-foreground">{document.name}</h4>
-              <p className="text-xs text-muted-foreground">{document.type === "custom" ? "Private" : "Public"}</p>
+              <p className="text-xs text-muted-foreground">{hasDocument ? "Uploaded" : "Not uploaded"}</p>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            {/* AI Generate button - only show if document can be generated and no document exists */}
             {document.canGenerate && !hasDocument && (
               <Button variant="outline" size="sm" className="text-xs h-7 bg-transparent" onClick={handleGenerateWithAI}>
                 <Sparkles className="h-3 w-3 mr-1" />
@@ -66,17 +131,19 @@ export function DocumentCard({ document }: DocumentCard) {
               </Button>
             )}
 
-            {/* Upload button - only show if no document exists */}
-            {!hasDocument && (
-              <UploadButton
-                onUpload={handleUpload}
-                acceptedTypes=".pdf,.doc,.docx,.txt"
-                maxSize={10}
-                className="text-xs h-7"
-              />
-            )}
+            <UploadButton
+              projectId={projectId}
+              title={document.name}
+              isPrivate={["Business Plan", "Pitchdeck"].includes(document.name)}
+              onUploadSuccess={handleUploadSuccess}
+              acceptedTypes=".pdf,.doc,.docx,.txt"
+              maxSize={10}
+              className="text-xs h-7"
+              isPredefined={true}
+            >
+              {hasDocument ? "Replace" : "Upload"}
+            </UploadButton>
 
-            {/* View and Download buttons - only show if document exists */}
             {hasDocument && (
               <>
                 <Button variant="outline" size="sm" onClick={handleView} className="text-xs h-7 bg-transparent">
