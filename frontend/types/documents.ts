@@ -1,35 +1,37 @@
-/**
- * Document management types
- */
-
 export interface Document {
   id: string
-  name: string
-  type: "business-plan" | "pitchdeck" | "litepaper" | "whitepaper" | "tokenomics" | "custom"
-  url?: string
-  canGenerate: boolean
-  createdAt: string
-  updatedAt: string
-  createdBy?: {
-    id: string
-    name: string
-  }
   project_id: string
+  title: string
+  file_url: string
+  file_name: string
   file_size?: number
   file_type?: string
+  privacy: "private" | "public"
+  created_at: string
+  updated_at: string
 }
 
 export interface DocumentCreateInput {
-  name: string
-  type: Document["type"]
   project_id: string
-  url?: string
+  title: string
+  file_url: string
+  file_name: string
   file_size?: number
   file_type?: string
+  privacy: "private" | "public"
 }
 
 export interface DocumentUpdateInput {
-  name?: string
-  type?: Document["type"]
+  title?: string
+  is_private?: boolean
+}
+export interface PredefinedDocument {
+  id: string
+  name: string
+  type: "business-plan" | "pitchdeck" 
+  canGenerate: boolean
+  project_id: string
+  createdAt: string
+  updatedAt: string
   url?: string
 }
