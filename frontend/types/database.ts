@@ -9,6 +9,9 @@ export interface Database {
     Tables: {
       profiles: {
         Row: {
+          username: string
+          profile_picture: string
+          skills: never[]
           id: string
           wallet_address: string | null
           created_at: string
