@@ -1,10 +1,11 @@
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { projectService } from "@/app/services/projects/project-service"
 import { ProjectNav } from "@/components/projects/nav/ProjectNav"
 import { TeamRoles } from "@/components/projects/nav/team/TeamRoles"
 import { TeamMembersTable } from "@/components/projects/nav/team/TeamMembersTable"
 import { TeamHeader } from "@/components/projects/nav/team/TeamHeader"
 import { InvitationLinkCard } from "@/components/projects/nav/team/InvitationLinkCard"
+import { createClient } from "@/lib/supabase/server"
 
 interface TeamPageProps {
   params: {
@@ -13,33 +14,55 @@ interface TeamPageProps {
 }
 
 export default async function TeamPage(props: TeamPageProps) {
-  const params = await props.params
-  const project = await projectService.getProject(params.id)
+  const { id } = await props.params
+  const supabase = await createClient()
 
-  if (!project) {
-    notFound()
+  // Check authentication
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    redirect('/login')
   }
 
-  // Fetch team members from Supabase
-  const teamMembers = await projectService.getTeamMembers(params.id)
+  try {
+    const project = await projectService.getProject(id)
+    if (!project) {
+      notFound()
+    }
 
-  return (
-    <div className="space-y-6">
-      <ProjectNav projectId={params.id} />
+    const teamMembers = await projectService.getTeamMembers(id)
+    const currentUserMembership = teamMembers.find(member => member.user_id === user.id)
+    const isProjectOwner = currentUserMembership?.role?.toLowerCase() === 'owner'
 
-      <div className="mt-8 space-y-8">
-        <TeamHeader />
-        <InvitationLinkCard />
+    return (
+      <div className="space-y-6">
+        <ProjectNav projectId={id} />
         
+        <div className="mt-8 space-y-8">
+          <TeamHeader 
+            projectName={project.name} 
+            memberCount={teamMembers.length}
+          />
+          
+          {isProjectOwner && <InvitationLinkCard />}
 
-        {/* Display team members */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Team Members</h2>
-          <TeamMembersTable teamMembers={teamMembers} />
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Team Members</h2>
+            <TeamMembersTable
+              teamMembers={teamMembers}
+              currentUserId={user.id}
+              isProjectOwner={isProjectOwner}
+            />
+          </div>
+
+          <TeamRoles
+            roles={[]}
+            teamMembers={teamMembers}
+            isProjectOwner={isProjectOwner}
+          />        
         </div>
-
-        <TeamRoles />
       </div>
-    </div>
-  )
+    )
+  } catch (error) {
+    notFound()
+  }
 }

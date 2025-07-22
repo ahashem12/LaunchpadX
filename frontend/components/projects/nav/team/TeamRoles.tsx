@@ -5,20 +5,34 @@ import { AlertCards } from "./AlertCards"
 import { CreateRoleModal } from "./CreateRoleModal/CreateRoleModal"
 import { RecommendedRolesTable } from "./RecommendedRolesTable"
 import { RoleFilterBadges } from "./RoleFilterBadges"
-import { TeamMembersTable } from "./TeamMembersTable"
-import { getAllTeamMembers } from "@/lib/mock-data"
+import type { TeamMember, TeamRole } from "@/types"
 
-export function TeamRoles() {
+interface TeamRolesProps {
+  roles: TeamRole[]
+  teamMembers: TeamMember[]
+  isProjectOwner: boolean
+}
+
+export function TeamRoles({ roles, teamMembers, isProjectOwner }: TeamRolesProps) {
   const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false)
-  const [teamMembers] = useState(getAllTeamMembers()) // Using mock data
 
   return (
     <div className="space-y-8">
-      <RoleFilterBadges onCreateRoleClick={() => setIsCreateRoleModalOpen(true)} />
-      <TeamMembersTable teamMembers={teamMembers} />
+      {isProjectOwner && (
+        <RoleFilterBadges onCreateRoleClick={() => setIsCreateRoleModalOpen(true)} />
+      )}
+      
       <AlertCards />
+      
       <RecommendedRolesTable onCreateRoleClick={() => setIsCreateRoleModalOpen(true)} />
-      <CreateRoleModal isOpen={isCreateRoleModalOpen} onClose={() => setIsCreateRoleModalOpen(false)} />
+
+      
+      {isProjectOwner && (
+        <CreateRoleModal 
+          isOpen={isCreateRoleModalOpen} 
+          onClose={() => setIsCreateRoleModalOpen(false)} 
+        />
+      )}
     </div>
   )
 }
