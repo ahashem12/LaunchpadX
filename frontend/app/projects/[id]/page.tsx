@@ -3,7 +3,6 @@ import { ProjectNav } from "@/components/projects/nav/ProjectNav"
 import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader"
 import { ProjectDescription } from "@/components/projects/nav/details/ProjectDescription"
 import { ProjectNextSteps } from "@/components/projects/nav/details/ProjectNextSteps"
-import { ProjectReviews } from "@/components/projects/nav/details/ProjectReviews"
 import { projectService } from "@/app/services/projects/project-service"
 
 interface DetailsPageProps {
@@ -29,11 +28,8 @@ export default async function DetailsPage(props: DetailsPageProps) {
 
       <ProjectNav projectId={params.id} />
       <ProjectDescription description={project.description} />
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ProjectNextSteps />
-        <ProjectReviews />
-      </div>
+      <ProjectMedia />
+      <ProjectNextSteps />
     </div>
   )
 }
