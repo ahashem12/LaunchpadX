@@ -1,17 +1,17 @@
+
 interface NextStepContentProps {
   description: string
-  buttonText?: string
+  stepId: string
+  onDelete: (id: string) => void
 }
 
-export function NextStepContent({ description, buttonText }: NextStepContentProps) {
+export function NextStepContent({ description }: NextStepContentProps) {
+
   return (
-    <div className="space-y-2 text-sm text-gray-300">
-      <p>{description}</p>
-      {buttonText && (
-        <button className="mt-2 rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 transition">
-          {buttonText}
-        </button>
-      )}
-    </div>
+    <>
+      <div className="space-y-4">
+        <p className="text-gray-300 text-sm leading-relaxed">{description}</p>
+      </div>
+    </>
   )
 }
