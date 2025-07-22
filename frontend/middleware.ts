@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/legal")
 
   // Get authentication status from Supabase session
+  // SECURE: Environment-aware authentication check
   let isAuthenticated = false
   try {
     // Get the session from Supabase
@@ -55,17 +56,24 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getSession()
     isAuthenticated = !!session
 
-    // If no session but mockAuth cookie exists (for development testing)
-    if (!isAuthenticated && !!mockAuth) {
+    // SECURE: Only allow mock auth in development environment
+    if (!isAuthenticated && process.env.NODE_ENV === "development" && !!mockAuth) {
+      console.warn("🔒 Using mock authentication in development mode")
       isAuthenticated = true
     }
   } catch (error) {
     console.error("Error checking authentication:", error)
-    // Fallback to cookie check if Supabase auth check fails
+    // SECURE: Fallback only checks real auth cookies, no mock bypass
     const hasSupabaseAuthCookie = Array.from(request.cookies.getAll()).some(
       (cookie) => cookie.name.startsWith("sb-") && cookie.name.includes("-auth-token"),
     )
-    isAuthenticated = hasSupabaseAuthCookie || !!mockAuth
+    isAuthenticated = hasSupabaseAuthCookie
+
+    // SECURE: Mock auth only in development with explicit warning
+    if (!isAuthenticated && process.env.NODE_ENV === "development" && !!mockAuth) {
+      console.warn("🔒 Fallback to mock authentication in development mode")
+      isAuthenticated = true
+    }
   }
 
   // If the user is on an auth page and is authenticated, redirect to dashboard
