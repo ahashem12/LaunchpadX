@@ -1,38 +1,45 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef } from "react"
-import { Upload, FileText, X } from "lucide-react"
+import { Upload, FileText, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { DocumentService } from "@/app/services/document/document-service"
 import { toast } from "sonner"
+import type { Document } from "@/types/documents"
 
-interface UploadButton {
-  onUpload?: (file: File) => Promise<void>
+interface UploadButtonProps {
+  projectId: string
+  title: string
+  isPrivate?: boolean
+  onUploadSuccess?: (document: Document) => void
   acceptedTypes?: string
-  maxSize?: number // in MB
-  variant?: "default" | "outline" | "ghost"
-  size?: "default" | "sm" | "lg"
+  maxSize?: number
   className?: string
   children?: React.ReactNode
+  isPredefined?: boolean
+  disabled?: boolean
 }
 
 export function UploadButton({
-  onUpload,
-  acceptedTypes = ".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg",
+  projectId,
+  title,
+  isPrivate = false,
+  onUploadSuccess,
+  acceptedTypes = ".pdf,.doc,.docx,.txt",
   maxSize = 10,
-  variant = "outline",
-  size = "sm",
   className = "",
-  children,
-}: UploadButton) {
+  children = "Upload",
+  isPredefined = true,
+  disabled = false,
+}: UploadButtonProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
@@ -43,14 +50,21 @@ export function UploadButton({
     }
 
     // Validate file type
-    const fileExtension = "." + file.name.split(".").pop()?.toLowerCase()
-    if (!acceptedTypes.includes(fileExtension)) {
-      toast.error(`File type not supported. Accepted types: ${acceptedTypes}`)
+    const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`
+    const allowedTypes = acceptedTypes.split(",").map((type) => type.trim().toLowerCase())
+    if (!allowedTypes.includes(fileExtension)) {
+      toast.error(`File type not supported. Allowed types: ${acceptedTypes}`)
+      return
+    }
+
+    // Validate title for non-predefined documents
+    if (!isPredefined && !title.trim()) {
+      toast.error("Document title is required")
       return
     }
 
     setSelectedFile(file)
-    handleUpload(file)
+    await handleUpload(file)
   }
 
   const handleUpload = async (file: File) => {
@@ -58,29 +72,28 @@ export function UploadButton({
     setUploadProgress(0)
 
     try {
-      // Simulate upload progress
+      // Simulate progress for better UX
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
-          if (prev >= 90) {
+          if (prev >= 80) {
             clearInterval(progressInterval)
-            return 90
+            return 80
           }
-          return prev + 10
+          return prev + 20
         })
-      }, 200)
+      }, 300)
 
-      // Call the upload function if provided
-      if (onUpload) {
-        await onUpload(file)
-      } else {
-        // Simulate upload delay for demo
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-      }
+      const privacy = isPrivate ? "private" : "public"
+      const document = await DocumentService.replaceDocument(projectId, title.trim(), file, privacy)
 
       clearInterval(progressInterval)
       setUploadProgress(100)
 
-      toast.success(`${file.name} uploaded successfully!`)
+      toast.success(`${title} uploaded successfully!`)
+
+      if (onUploadSuccess) {
+        onUploadSuccess(document)
+      }
 
       // Reset after success
       setTimeout(() => {
@@ -93,14 +106,21 @@ export function UploadButton({
       }, 1000)
     } catch (error) {
       console.error("Upload error:", error)
-      toast.error("Upload failed. Please try again.")
+      toast.error(error instanceof Error ? error.message : "Upload failed")
       setIsUploading(false)
       setUploadProgress(0)
       setSelectedFile(null)
     }
   }
 
-  const handleButtonClick = () => {
+  const handleClick = () => {
+    if (disabled || isUploading) return
+
+    if (!isPredefined && !title.trim()) {
+      toast.error("Please enter a document title first")
+      return
+    }
+
     fileInputRef.current?.click()
   }
 
@@ -112,6 +132,8 @@ export function UploadButton({
       fileInputRef.current.value = ""
     }
   }
+
+  const isButtonDisabled = disabled || isUploading || (!isPredefined && !title.trim())
 
   if (isUploading) {
     return (
@@ -133,11 +155,21 @@ export function UploadButton({
 
   return (
     <>
-      <input ref={fileInputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
-      <Button variant={variant} size={size} onClick={handleButtonClick} className={`${className}`}>
-        <Upload className="h-3 w-3 mr-1" />
-        {children || "Upload"}
+      <Button variant="outline" size="sm" onClick={handleClick} disabled={isButtonDisabled} className={className}>
+        {isUploading ? (
+          <>
+            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+            Uploading...
+          </>
+        ) : (
+          <>
+            <Upload className="h-3 w-3 mr-1" />
+            {children}
+          </>
+        )}
       </Button>
+
+      <input ref={fileInputRef} type="file" accept={acceptedTypes} onChange={handleFileSelect} className="hidden" />
     </>
   )
 }
