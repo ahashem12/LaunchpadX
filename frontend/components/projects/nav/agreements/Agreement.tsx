@@ -64,16 +64,13 @@ export function Agreement() {
 
       <Card className="border-border bg-card overflow-hidden">
         <CardContent className="p-6">
-          <div className="flex items-start space-x-3 mb-4">
+          <div className="flex items-start space-x-3">
             <AlertCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
             <p className="text-foreground">
               We advise you to wait with creating the agreement until all members have joined the team and connected
               their wallets. You can always add co-founders to the agreement after the registration. However, this will
               require a vote from the team.
             </p>
-          </div>
-          <div className="flex justify-end">
-            <Button className="bg-green-600 hover:bg-green-700 text-white">Confirm</Button>
           </div>
         </CardContent>
       </Card>
