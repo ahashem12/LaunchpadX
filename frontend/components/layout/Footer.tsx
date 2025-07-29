@@ -10,7 +10,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Left: Brand and Links */}
           <div className="text-sm text-muted-foreground text-center md:text-left space-y-1">
-            <p>© {new Date().getFullYear()} Consulti</p>
+            <p>© {new Date().getFullYear()} LPX</p>
             <div className="flex gap-4 justify-center md:justify-start text-sm">
               <Link href="/privacy" className="hover:text-primary transition-colors">
                 Privacy

@@ -9,7 +9,7 @@ export default function Home() {
         <div className="container flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
             <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
-            <span className="text-xl font-bold text-white">Consulti</span>
+            <span className="text-xl font-bold text-white">LPX</span>
           </Link>
           <nav className="flex items-center gap-4">
             <Link href="/login">
@@ -32,7 +32,7 @@ export default function Home() {
               Simplify Your Project Management
             </h1>
             <p className="mt-4 text-lg text-gray-400 max-w-[550px]">
-              Consulti helps you manage your projects, teams, and agreements in one place. Get started today.
+              LPX helps you manage your projects, teams, and agreements in one place. Get started today.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link href="/signup">

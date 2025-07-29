@@ -82,7 +82,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <div className="h-16 border-b border-border flex items-center px-4">
         <Link href="/" className="flex items-center gap-2">
           <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
-          {!isCollapsed && <span className="text-xl font-bold text-white">Consulti</span>}
+          {!isCollapsed && <span className="text-xl font-bold text-white">LPX</span>}
         </Link>
         <button onClick={onToggle} className="ml-auto text-gray-400 hover:text-white">
           <ChevronLeft className={cn("h-5 w-5", isCollapsed && "rotate-180")} />

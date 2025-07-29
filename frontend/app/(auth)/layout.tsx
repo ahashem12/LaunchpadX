@@ -5,8 +5,8 @@ import { Inter } from "next/font/google"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Authentication - Consulti",
-  description: "Sign in or create an account for Consulti, an AI-powered project management platform.",
+  title: "Authentication - LPX",
+  description: "Sign in or create an account for LPX, an AI-powered project management platform.",
 }
 
 export default function AuthLayout({
