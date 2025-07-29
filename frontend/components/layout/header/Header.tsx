@@ -18,7 +18,7 @@ export function Header() {
         <div className="mr-4 hidden md:flex">
           {/* <Link href="/" className="mr-6 flex items-center space-x-2">
             <WatermelonIcon className="h-6 w-6" />
-            <span className="hidden font-bold sm:inline-block">Consulti</span>
+            <span className="hidden font-bold sm:inline-block">LPX</span>
           </Link> */}
           {/* <NavLinks /> */}
         </div>

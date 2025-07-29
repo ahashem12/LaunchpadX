@@ -72,7 +72,7 @@ export function LoginForm() {
     <div className="w-full max-w-md bg-[#1E1E1E] rounded-lg border border-[#2A2A2A] p-8">
       <div className="flex flex-col items-center mb-8">
         <WatermelonIcon size={180} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
-        <h2 className="text-2xl font-bold text-white">Consulti</h2>
+        <h2 className="text-2xl font-bold text-white">LPX</h2>
       </div>
 
       <h1 className="text-2xl font-bold text-center text-white mb-2">Sign in to your account</h1>

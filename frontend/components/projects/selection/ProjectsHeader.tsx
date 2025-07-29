@@ -1,5 +1,5 @@
 import { ViewToggle } from "./ViewToggle"
-import { CreateProjectButton } from "./CeateProjectButton"
+import { CreateProjectButton } from "./CreateProjectButton"
 
 interface ProjectsHeaderProps {
   view: "grid" | "list"

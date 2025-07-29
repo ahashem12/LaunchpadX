@@ -6,8 +6,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Consulti - AI-Powered Project Management",
-  description: "Simplify your project management with Consulti, an AI-powered consultant for your projects.",
+  title: "LPX - AI-Powered Project Management",
+  description: "Simplify your project management with LPX, an AI-powered consultant for your projects.",
   generator: "v0.dev",
 }
 
