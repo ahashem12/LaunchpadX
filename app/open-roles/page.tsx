@@ -1,55 +1,84 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { OpenRolesHeader, OpenRolesFilters, RolesGrid } from "@/components/open-roles"
-import { mockRoles } from "@/lib/mock-roles-data"
+import { projectService } from "@/app/services/projects/project-service"
+import type { TeamRole } from "@/types"
 
 export default function OpenRolesPage() {
+  const [roles, setRoles] = useState<TeamRole[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [roleType, setRoleType] = useState("all")
   const [category, setCategory] = useState("all")
   const [skill, setSkill] = useState("all")
   const [sortBy, setSortBy] = useState("newest")
 
-  const filteredRoles = useMemo(() => {
-    let filtered = [...mockRoles]
+  useEffect(() => {
+    const fetchRoles = async () => {
+      const openRoles = await projectService.getAllOpenRoles()
+      setRoles(openRoles)
+    }
+    fetchRoles()
+  }, [])
 
-    // Filter by search query
+  const [categories, setCategories] = useState<string[]>([])
+  const [skills, setSkills] = useState<string[]>([])
+
+  useEffect(() => {
+    const fetchRolesAndOptions = async () => {
+      const openRoles = await projectService.getAllOpenRoles()
+      setRoles(openRoles)
+
+      const uniqueCategories = [
+        ...new Set(
+          openRoles
+            .map((role) => role.role_category?.name)
+            .filter((name): name is string => !!name),
+        ),
+      ]
+      setCategories(uniqueCategories)
+
+      const allSkills = openRoles.flatMap((role) => role.requiredSkills || [])
+      const uniqueSkills = [...new Set(allSkills)]
+      setSkills(uniqueSkills)
+    }
+    fetchRolesAndOptions()
+  }, [])
+
+  const filteredRoles = useMemo(() => {
+    let filtered = [...roles]
+
     if (searchQuery) {
       filtered = filtered.filter(
         (role) =>
           role.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          role.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          role.project?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           role.description.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     }
 
-    // Filter by role type
-    if (roleType !== "all") {
-      filtered = filtered.filter((role) => role.type === roleType)
-    }
-
-    // Filter by category
     if (category !== "all") {
-      filtered = filtered.filter((role) => role.category === category)
+      filtered = filtered.filter((role) => role.role_category?.name === category)
     }
 
-    // Filter by skill
+    if (roleType !== "all") {
+      filtered = filtered.filter((role) => role.role_type === roleType)
+    }
+
     if (skill !== "all") {
-      filtered = filtered.filter((role) => role.skills.includes(skill))
+      filtered = filtered.filter((role) => role.requiredSkills && role.requiredSkills.includes(skill))
     }
 
-    // Sort
     filtered.sort((a, b) => {
       if (sortBy === "newest") {
-        return new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       } else {
-        return new Date(a.postedAt).getTime() - new Date(b.postedAt).getTime()
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       }
     })
 
     return filtered
-  }, [searchQuery, roleType, category, skill, sortBy])
+  }, [roles, searchQuery, roleType, category, skill, sortBy])
 
   return (
     <div className="min-h-screen bg-background">
@@ -61,8 +90,10 @@ export default function OpenRolesPage() {
           setSearchQuery={setSearchQuery}
           roleType={roleType}
           setRoleType={setRoleType}
+          categories={categories}
           category={category}
           setCategory={setCategory}
+          skills={skills}
           skill={skill}
           setSkill={setSkill}
           sortBy={sortBy}

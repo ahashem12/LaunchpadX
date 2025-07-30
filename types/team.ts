@@ -15,11 +15,25 @@ export interface TeamMember {
 }
 
 export interface TeamRole {
-  id: string;
-  title: string;
-  description: string;
-  requiredSkills: string[];
-  assigned: boolean;
-  assignedTo?: string;
-  created_at: string;
+  id: string
+  title: string
+  description: string
+  requiredSkills: string[]
+  assigned: boolean
+  assignedTo?: string
+  created_at: string
+  status: string
+  role_type?: string
+  flat_money_min?: number | null
+  flat_money_max?: number | null
+  equity_percentage?: number | null
+  role_category?: {
+    id: string
+    name: string
+  }
+  project?: {
+    id: string
+    name: string
+    logo_url: string
+  }
 }

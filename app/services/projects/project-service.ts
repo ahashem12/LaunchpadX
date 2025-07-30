@@ -1,5 +1,5 @@
 import { createProject } from "./create"
-import { getProject, getUserProjects } from "./read"
+import { getProject, getUserProjects, getProjectRoles, getAllOpenRoles } from "./read"
 import { updateProject } from "./update"
 import { deleteProject } from "./delete"
 import { addProjectMember, removeProjectMember, hasProjectAccess } from "./members"
@@ -11,8 +11,10 @@ export const projectService = {
   updateProject,
   deleteProject,
   getUserProjects,
-  hasProjectAccess,
   addProjectMember,
   removeProjectMember,
   getTeamMembers,
+  getProjectRoles,
+  getAllOpenRoles,
+  hasProjectAccess,
 }

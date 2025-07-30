@@ -8,11 +8,13 @@ interface OpenRolesFiltersProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
   roleType: string
-  setRoleType: (type: string) => void
+  setRoleType: (roleType: string) => void
   category: string
   setCategory: (category: string) => void
+  categories: string[]
   skill: string
   setSkill: (skill: string) => void
+  skills: string[]
   sortBy: string
   setSortBy: (sort: string) => void
 }
@@ -24,15 +26,17 @@ export function OpenRolesFilters({
   setRoleType,
   category,
   setCategory,
+  categories,
   skill,
   setSkill,
+  skills,
   sortBy,
   setSortBy,
 }: OpenRolesFiltersProps) {
   return (
     <div className="mb-8 p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50">
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
           <Select value={roleType} onValueChange={setRoleType}>
             <SelectTrigger className="w-full sm:w-[180px] bg-background/50">
               <SelectValue placeholder="Role Type" />
@@ -52,13 +56,11 @@ export function OpenRolesFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="product">Product</SelectItem>
-              <SelectItem value="executive">Executive</SelectItem>
-              <SelectItem value="operations">Operations</SelectItem>
-              <SelectItem value="engineering">Engineering</SelectItem>
-              <SelectItem value="design">Design</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="business">Business</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -68,7 +70,11 @@ export function OpenRolesFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Skills</SelectItem>
-              <SelectItem value="UI Design">UI Design</SelectItem>
+              {skills.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
               <SelectItem value="UX Design">UX Design</SelectItem>
               <SelectItem value="Frontend Development">Frontend Development</SelectItem>
               <SelectItem value="Backend Development">Backend Development</SelectItem>
