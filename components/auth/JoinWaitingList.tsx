@@ -19,28 +19,15 @@ export function JoinWaitingList() {
     phoneNumber: "",
     city: "",
     expertise: "",
-    // now holds multiple selections
-    joiningReason: [] as string[],
+    joiningReason: "",       // single choice
   })
   const [errors, setErrors] = useState({ phoneNumber: "" })
   const supabase = createClient()
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, checked } = e.target
-
-    if (name === "joiningReason") {
-      setFormData(prev => {
-        const list = [...prev.joiningReason]
-        return {
-          ...prev,
-          joiningReason: checked
-            ? [...list, value]
-            : list.filter(x => x !== value)
-        }
-      })
-      return
-    }
-
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
@@ -62,11 +49,11 @@ export function JoinWaitingList() {
       .from("waiting_list")
       .insert({
         name: formData.name,
+        familyName: formData.familyName,
         email: formData.email,
         phone: formData.phoneNumber,
         city: formData.city,
         expertise: formData.expertise,
-        // send the array of selected reasons
         joiningReason: formData.joiningReason,
       })
 
@@ -122,6 +109,20 @@ export function JoinWaitingList() {
               />
             </div>
 
+            {/* Family Name */}
+            <div className="space-y-2">
+              <Label htmlFor="familyName">Family Name</Label>
+              <Input
+                id="familyName"
+                name="familyName"
+                value={formData.familyName}
+                onChange={handleInputChange}
+                placeholder="Your Family Name"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
             {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -155,7 +156,42 @@ export function JoinWaitingList() {
               )}
             </div>
 
-            {/* Joining Reason (checkboxes) */}
+            {/* City of Residence */}
+            <div className="space-y-2">
+              <Label htmlFor="city">City of Residence</Label>
+              <Input
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                placeholder="Your City"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Field Of Expertise */}
+            <div className="space-y-2">
+              <Label htmlFor="expertise">Field Of Expertise</Label>
+              <select
+                id="expertise"
+                name="expertise"
+                value={formData.expertise}
+                onChange={handleInputChange}
+                required
+                disabled={isLoading}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              >
+                <option value="">Select your expertise</option>
+                <option value="Tech">Tech</option>
+                <option value="Business">Business</option>
+                <option value="Content building">Content building</option>
+                <option value="Data">Data</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Joining Reason (single-choice radios) */}
             <div className="space-y-2">
               <Label>Are you joining LPX to:</Label>
               <div className="flex flex-col pl-2 space-y-1">
@@ -167,10 +203,10 @@ export function JoinWaitingList() {
                 ].map(reason => (
                   <label key={reason} className="inline-flex items-center">
                     <input
-                      type="checkbox"
+                      type="radio"
                       name="joiningReason"
                       value={reason}
-                      checked={formData.joiningReason.includes(reason)}
+                      checked={formData.joiningReason === reason}
                       onChange={handleInputChange}
                       disabled={isLoading}
                       className="mr-2"
