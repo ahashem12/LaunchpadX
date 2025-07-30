@@ -180,7 +180,7 @@ export function JoinWaitingList() {
                 onChange={handleInputChange}
                 required
                 disabled={isLoading}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                className="block w-full rounded-md border border-gray-300 bg-white text-black px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="">Select your expertise</option>
                 <option value="Tech">Tech</option>
