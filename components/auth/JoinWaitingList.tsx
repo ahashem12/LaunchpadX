@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Logo } from "@/components/ui/logo"
 import { toast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+
 
 export function JoinWaitingList() {
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -23,6 +25,7 @@ export function JoinWaitingList() {
   })
   const [errors, setErrors] = useState({ phoneNumber: "" })
   const supabase = createClient()
+  const router = useRouter()
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -68,6 +71,8 @@ export function JoinWaitingList() {
       })
     } else {
       setIsSubmitted(true)
+      setTimeout(() => router.push("/"), 3000)
+
     }
   }
 
@@ -87,6 +92,21 @@ export function JoinWaitingList() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
+            <header className="w-full border-b border-border">
+              <div className="container flex h-16 items-center justify-between px-4">
+                <Link href="/" className="flex items-center gap-2">
+                  <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+                  <span className="text-xl font-bold text-white">LPX</span>
+                </Link>
+                <nav className="flex items-center gap-4">
+                  <Link href="/login">
+                    <Button variant="ghost" className="text-white">
+                      Log In
+                    </Button>
+                  </Link>
+                </nav>
+              </div>
+            </header>
       <Card className="w-full max-w-md">
         <CardHeader className="items-center text-center">
           <Logo />
@@ -182,12 +202,12 @@ export function JoinWaitingList() {
                 disabled={isLoading}
                 className="block w-full rounded-md border border-gray-300 bg-white text-black px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
               >
-                <option value="">Select your expertise</option>
-                <option value="Tech">Tech</option>
-                <option value="Business">Business</option>
-                <option value="Content building">Content building</option>
-                <option value="Data">Data</option>
-                <option value="Other">Other</option>
+                <option value="" className="text-black">Select your expertise</option>
+                <option value="Tech" className="text-black">Tech</option>
+                <option value="Business" className="text-black">Business</option>
+                <option value="Content building" className="text-black">Content building</option>
+                <option value="Data" className="text-black">Data</option>
+                <option value="Other" className="text-black">Other</option>
               </select>
             </div>
 
