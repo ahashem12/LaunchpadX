@@ -1,7 +1,21 @@
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export function CompensationTab() {
+interface CompensationTabProps {
+  data: {
+    flat_money_min?: number
+    flat_money_max?: number
+    equity_percentage?: number
+  }
+  onDataChange: (field: string, value: number | undefined) => void
+}
+
+export function CompensationTab({ data, onDataChange }: CompensationTabProps) {
+  const handleNumberChange = (field: string, value: string) => {
+    const numberValue = value === "" ? undefined : Number(value)
+    onDataChange(field, numberValue)
+  }
+
   return (
     <div className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
       <div>
@@ -18,6 +32,8 @@ export function CompensationTab() {
                 <Input
                   type="number"
                   placeholder="0"
+                  value={data.flat_money_min ?? ""}
+                  onChange={(e) => handleNumberChange("flat_money_min", e.target.value)}
                   className="w-32 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
@@ -27,6 +43,8 @@ export function CompensationTab() {
                 <Input
                   type="number"
                   placeholder="0"
+                  value={data.flat_money_max ?? ""}
+                  onChange={(e) => handleNumberChange("flat_money_max", e.target.value)}
                   className="w-32 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
@@ -42,6 +60,8 @@ export function CompensationTab() {
               <Input
                 type="number"
                 placeholder="0"
+                value={data.equity_percentage ?? ""}
+                onChange={(e) => handleNumberChange("equity_percentage", e.target.value)}
                 className="w-32 bg-muted border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>

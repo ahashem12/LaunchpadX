@@ -1,15 +1,15 @@
 import { RoleCard } from "./RoleCard"
-import type { Role } from "@/lib/mock-roles-data"
+import type { TeamRole } from "@/types"
 
 interface RolesGridProps {
-  roles: Role[]
+  roles: TeamRole[]
 }
 
 export function RolesGrid({ roles }: RolesGridProps) {
-  if (roles.length === 0) {
+  if (!roles || roles.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground text-lg">No roles found matching your criteria.</p>
+        <p className="text-muted-foreground text-lg">No open roles found.</p>
       </div>
     )
   }

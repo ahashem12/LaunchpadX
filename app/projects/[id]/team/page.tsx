@@ -30,6 +30,7 @@ export default async function TeamPage(props: TeamPageProps) {
     }
 
     const teamMembers = await projectService.getTeamMembers(id)
+    const roles = await projectService.getProjectRoles(id)
     const currentUserMembership = teamMembers.find(member => member.user_id === user.id)
     const isProjectOwner = currentUserMembership?.role?.toLowerCase() === 'owner'
 
@@ -55,9 +56,10 @@ export default async function TeamPage(props: TeamPageProps) {
           </div>
 
           <TeamRoles
-            roles={[]}
+            roles={roles}
             teamMembers={teamMembers}
             isProjectOwner={isProjectOwner}
+            projectId={id}
           />        
         </div>
       </div>
