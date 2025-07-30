@@ -14,15 +14,34 @@ export function JoinWaitingList() {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
+    familyName: "",
     email: "",
     phoneNumber: "",
+    city: "",
+    expertise: "",
+    // now holds multiple selections
+    joiningReason: [] as string[],
   })
   const [errors, setErrors] = useState({ phoneNumber: "" })
   const supabase = createClient()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    const { name, value, checked } = e.target
+
+    if (name === "joiningReason") {
+      setFormData(prev => {
+        const list = [...prev.joiningReason]
+        return {
+          ...prev,
+          joiningReason: checked
+            ? [...list, value]
+            : list.filter(x => x !== value)
+        }
+      })
+      return
+    }
+
+    setFormData(prev => ({ ...prev, [name]: value }))
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
     }
@@ -39,11 +58,17 @@ export function JoinWaitingList() {
 
     setIsLoading(true)
 
-    const { error } = await supabase.from("waiting_list").insert({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phoneNumber,
-    })
+    const { error } = await supabase
+      .from("waiting_list")
+      .insert({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phoneNumber,
+        city: formData.city,
+        expertise: formData.expertise,
+        // send the array of selected reasons
+        joiningReason: formData.joiningReason,
+      })
 
     setIsLoading(false)
 
@@ -83,6 +108,7 @@ export function JoinWaitingList() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -95,6 +121,8 @@ export function JoinWaitingList() {
                 disabled={isLoading}
               />
             </div>
+
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -108,6 +136,8 @@ export function JoinWaitingList() {
                 disabled={isLoading}
               />
             </div>
+
+            {/* Phone Number */}
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
@@ -120,8 +150,37 @@ export function JoinWaitingList() {
                 required
                 disabled={isLoading}
               />
-              {errors.phoneNumber && <p className="text-sm text-red-500 pt-1">{errors.phoneNumber}</p>}
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500 pt-1">{errors.phoneNumber}</p>
+              )}
             </div>
+
+            {/* Joining Reason (checkboxes) */}
+            <div className="space-y-2">
+              <Label>Are you joining LPX to:</Label>
+              <div className="flex flex-col pl-2 space-y-1">
+                {[
+                  "Be matched with projects",
+                  "Build Projects",
+                  'Contribute Expertise - "Know how"',
+                  "Become a Partner",
+                ].map(reason => (
+                  <label key={reason} className="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      name="joiningReason"
+                      value={reason}
+                      checked={formData.joiningReason.includes(reason)}
+                      onChange={handleInputChange}
+                      disabled={isLoading}
+                      className="mr-2"
+                    />
+                    {reason}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Joining..." : "Join Now"}
             </Button>
