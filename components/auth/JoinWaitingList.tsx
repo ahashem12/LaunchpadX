@@ -92,21 +92,7 @@ export function JoinWaitingList() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-            <header className="w-full border-b border-border">
-              <div className="container flex h-16 items-center justify-between px-4">
-                <Link href="/" className="flex items-center gap-2">
-                  <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
-                  <span className="text-xl font-bold text-white">LPX</span>
-                </Link>
-                <nav className="flex items-center gap-4">
-                  <Link href="/login">
-                    <Button variant="ghost" className="text-white">
-                      Log In
-                    </Button>
-                  </Link>
-                </nav>
-              </div>
-            </header>
+
       <Card className="w-full max-w-md">
         <CardHeader className="items-center text-center">
           <Logo />
@@ -200,7 +186,8 @@ export function JoinWaitingList() {
                 onChange={handleInputChange}
                 required
                 disabled={isLoading}
-                className="block w-full rounded-md border border-gray-300 bg-white text-black px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary !text-black"
+                style={{ color: "#000" }}
               >
                 <option value="" className="text-black">Select your expertise</option>
                 <option value="Tech" className="text-black">Tech</option>
