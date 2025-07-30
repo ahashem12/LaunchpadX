@@ -31,9 +31,9 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
               Simplify Venture Building.
             </h1>
-            <h3 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white fst-italic">>
-              Where Talents Meet Projects. Where Projects Meet Capital.
-            </h3>
+          <h3 className="text-2xl italic tracking-tighter sm:text-3xl md:text-4xl text-white">
+            Where Talents Meet Projects. Where Projects Meet Capital.
+          </h3>
             <p className="mt-4 text-lg text-gray-400 max-w-[550px]">
               LPX simplifies how you build, contribute, and get funded — all in one ecosystem.
             </p>
