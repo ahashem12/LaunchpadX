@@ -48,14 +48,28 @@ export function LoginForm() {
 
       if (authError) {
         setError(authError.message)
-        isDev && setDebugInfo(`Authentication error: ${authError.message}`)
+        isDev && setDebugInfo(`Supabase auth error: ${authError.message}`)
+        setIsLoading(false)
         return
       }
 
-      isDev && setDebugInfo(
-        `Authentication successful. User: ${data.user?.email}. Redirecting to dashboard...`,
-      )
+      if (data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("is_active")
+          .eq("id", data.user.id)
+          .single()
 
+        if (profileError || !profile?.is_active) {
+          await supabase.auth.signOut()
+          setError("Your account is awaiting admin approval. Please check back later.")
+          isDev && setDebugInfo("User is not active. Signed out.")
+          setIsLoading(false)
+          return
+        }
+      }
+
+      isDev && setDebugInfo("Supabase auth successful. Redirecting to dashboard...")
       setTimeout(() => {
         router.push("/dashboard")
         router.refresh()
