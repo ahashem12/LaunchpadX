@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { AlertCards } from "./AlertCards"
 import { CreateRoleModal } from "./CreateRoleModal/CreateRoleModal"
 // import { RecommendedRolesTable } from "./RecommendedRolesTable"
@@ -13,15 +12,25 @@ interface TeamRolesProps {
   teamMembers: TeamMember[]
   isProjectOwner: boolean
   projectId: string
+  roleCounts: Record<string, number>
+  onCreateRoleClick: () => void
+  isCreateRoleModalOpen: boolean
+  onCloseCreateRoleModal: () => void
 }
 
-export function TeamRoles({ roles, teamMembers, isProjectOwner, projectId }: TeamRolesProps) {
-  const [isCreateRoleModalOpen, setIsCreateRoleModalOpen] = useState(false)
-
+export function TeamRoles({ 
+  roles, 
+  isProjectOwner, 
+  roleCounts, 
+  onCreateRoleClick, 
+  isCreateRoleModalOpen,
+  onCloseCreateRoleModal,
+  projectId
+}: TeamRolesProps) {
   return (
     <div className="space-y-8">
       {isProjectOwner && (
-        <RoleFilterBadges onCreateRoleClick={() => setIsCreateRoleModalOpen(true)} />
+        <RoleFilterBadges roleCounts={roleCounts} onCreateRoleClick={onCreateRoleClick} />
       )}
       
       <AlertCards roles={roles} />
@@ -34,7 +43,7 @@ export function TeamRoles({ roles, teamMembers, isProjectOwner, projectId }: Tea
       {isProjectOwner && (
         <CreateRoleModal 
           isOpen={isCreateRoleModalOpen} 
-          onClose={() => setIsCreateRoleModalOpen(false)} 
+          onClose={onCloseCreateRoleModal} 
           projectId={projectId}
         />
       )}

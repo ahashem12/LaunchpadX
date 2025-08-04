@@ -3,7 +3,10 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/lib/supabase/client"
+import { projectService } from "@/app/services/projects/project-service"
+import { Skill } from "@/app/services/skills"
+import { Badge } from "@/components/ui/badge"
+import { X } from "lucide-react"
 
 interface RoleType {
   id: string
@@ -29,27 +32,37 @@ interface BasicInfoTabProps {
 export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
   const [roleTypes, setRoleTypes] = useState<RoleType[]>([])
   const [roleCategories, setRoleCategories] = useState<RoleCategory[]>([])
-  const supabase = createClient()
+  const [skills, setSkills] = useState<Skill[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isDropdownOpen, setDropdownOpen] = useState(false)
 
   useEffect(() => {
-    const fetchDropdownData = async () => {
-      const { data: typesData, error: typesError } = await supabase.from("role_types").select("id, name")
-      if (typesError) {
-        console.error("Error fetching role types:", typesError)
-      } else {
-        setRoleTypes(typesData)
-      }
-
-      const { data: categoriesData, error: categoriesError } = await supabase.from("role_categories").select("id, name")
-      if (categoriesError) {
-        console.error("Error fetching role categories:", categoriesError)
-      } else {
-        setRoleCategories(categoriesData)
-      }
+    const fetchInitialData = async () => {
+      const { data: typesData } = await projectService.getRoleTypes()
+      const { data: categoriesData } = await projectService.getRoleCategories()
+      const skillsData = await projectService.getAllSkills()
+      setRoleTypes(typesData || [])
+      setRoleCategories(categoriesData || [])
+      setSkills(skillsData)
     }
+    fetchInitialData()
+  }, [])
 
-    fetchDropdownData()
-  }, [supabase])
+  const handleSkillSelect = (skillId: string) => {
+    if (!data.required_skills.includes(skillId)) {
+      onDataChange("required_skills", [...data.required_skills, skillId])
+    }
+    setSearchTerm("")
+    setDropdownOpen(false)
+  }
+
+  const handleSkillRemove = (skillId: string) => {
+    onDataChange("required_skills", data.required_skills.filter((id) => id !== skillId))
+  }
+
+  const filteredSkills = skills.filter((skill) =>
+    skill.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   return (
     <div className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
@@ -106,14 +119,45 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
         <Label htmlFor="required-skills" className="text-foreground">
           Required skills <span className="text-red-500">*</span>
         </Label>
-        <Input
-          id="required-skills"
-          value={data.required_skills.join(", ")}
-          onChange={(e) => onDataChange("required_skills", e.target.value.split(",").map((s) => s.trim()))}
-          className="mt-1.5 bg-muted border-border text-foreground"
-          placeholder="React, TypeScript, Tailwind CSS"
-        />
-        <p className="text-xs text-muted-foreground mt-1.5">Enter skills separated by commas.</p>
+        <div className="relative">
+          <Input
+            id="required-skills"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setDropdownOpen(true)}
+            onBlur={() => setTimeout(() => setDropdownOpen(false), 150)} // Delay to allow click
+            className="mt-1.5 bg-muted border-border text-foreground"
+            placeholder="Search for skills..."
+          />
+          {isDropdownOpen && (
+            <ul className="absolute z-10 w-full bg-card border border-border rounded-md mt-1 max-h-60 overflow-auto">
+              {filteredSkills.map((skill) => (
+                <li
+                  key={skill.id}
+                  className="px-3 py-2 cursor-pointer hover:bg-muted"
+                  onClick={() => handleSkillSelect(skill.id)}
+                >
+                  {skill.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {data.required_skills.map((skillId) => {
+            const skill = skills.find((s) => s.id === skillId)
+            return (
+              skill && (
+                <Badge key={skill.id} variant="secondary" className="flex items-center gap-1">
+                  {skill.name}
+                  <button onClick={() => handleSkillRemove(skill.id)} className="focus:outline-none">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              )
+            )
+          })}
+        </div>
       </div>
 
       <div>
