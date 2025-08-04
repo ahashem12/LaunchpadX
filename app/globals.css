@@ -45,6 +45,21 @@
   }
 }
 
+@layer components {
+  .toaster {
+    @apply fixed top-0 right-0 z-50 p-4 w-full max-w-sm;
+  }
+  .toast {
+    @apply w-full p-4 rounded-lg shadow-lg;
+  }
+  .toast-title {
+    @apply font-semibold;
+  }
+  .toast-description {
+    @apply mt-1 text-sm;
+  }
+}
+
 /* Custom styles to match the reference UI */
 .sidebar-item {
   @apply flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors;

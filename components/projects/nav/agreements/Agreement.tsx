@@ -1,16 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check, AlertCircle, FileText } from "lucide-react"
 import { AgreementWizardModal } from "./AgreementWizardModal"
 import type { AgreementData } from "@/types/agreements"
+import { useToast } from "@/hooks/use-toast"
+import { projectService } from "@/app/services/projects/project-service"
+import type { TeamMember } from "@/types"
 
-export function Agreement() {
+interface AgreementProps {
+  projectId: string
+}
+
+export function Agreement({ projectId }: AgreementProps) {
   const [selectedAgreement, setSelectedAgreement] = useState<AgreementOption | null>(null)
   const [isWizardOpen, setIsWizardOpen] = useState(false)
   const [agreementData, setAgreementData] = useState<AgreementData | null>(null)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const { toast } = useToast()
 
   const agreementOptions: AgreementOption[] = [
     {
@@ -40,8 +49,29 @@ export function Agreement() {
     },
   ]
 
-  const handleSelectAgreement = (agreement: AgreementOption) => {
-    setSelectedAgreement(agreement)
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      const members = await projectService.getTeamMembers(projectId)
+      setTeamMembers(members)
+    }
+    fetchTeamMembers()
+  }, [projectId])
+
+  const handleSelectAgreement = (option: AgreementOption) => {
+    const coFounders = teamMembers.filter(
+      (member) => member.role.toLowerCase() === "co-founder",
+    )
+
+    if (coFounders.length < 2) {
+      toast({
+        title: "Cannot Create Agreement",
+        description: "You need at least two co-founders on the team to create an agreement.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setSelectedAgreement(option)
     setIsWizardOpen(true)
   }
 
