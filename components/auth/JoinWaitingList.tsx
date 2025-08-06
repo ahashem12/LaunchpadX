@@ -8,23 +8,32 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Logo } from "@/components/ui/logo"
 import { toast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+
 
 export function JoinWaitingList() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
+    familyName: "",
     email: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    city: "",
+    expertise: "",
+    joiningReason: "",       // single choice
   })
   const [errors, setErrors] = useState({ phoneNumber: "", password: "" })
   const supabase = createClient()
+  const router = useRouter()
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
     }
@@ -84,6 +93,8 @@ export function JoinWaitingList() {
       })
     } else {
       setIsSubmitted(true)
+      setTimeout(() => router.push("/"), 3000)
+
     }
   }
 
@@ -105,6 +116,7 @@ export function JoinWaitingList() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
+
       <Card className="w-full max-w-md">
         <CardHeader className="items-center text-center">
           <Logo />
@@ -113,6 +125,7 @@ export function JoinWaitingList() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -125,6 +138,22 @@ export function JoinWaitingList() {
                 disabled={isLoading}
               />
             </div>
+
+            {/* Family Name */}
+            <div className="space-y-2">
+              <Label htmlFor="familyName">Family Name</Label>
+              <Input
+                id="familyName"
+                name="familyName"
+                value={formData.familyName}
+                onChange={handleInputChange}
+                placeholder="Your Family Name"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -138,6 +167,8 @@ export function JoinWaitingList() {
                 disabled={isLoading}
               />
             </div>
+
+            {/* Phone Number */}
             <div className="space-y-2">
               <Label htmlFor="phoneNumber">Phone Number</Label>
               <Input
@@ -150,7 +181,45 @@ export function JoinWaitingList() {
                 required
                 disabled={isLoading}
               />
-              {errors.phoneNumber && <p className="text-sm text-red-500 pt-1">{errors.phoneNumber}</p>}
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500 pt-1">{errors.phoneNumber}</p>
+              )}
+            </div>
+
+            {/* City of Residence */}
+            <div className="space-y-2">
+              <Label htmlFor="city">City of Residence</Label>
+              <Input
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                placeholder="Your City"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Field Of Expertise */}
+            <div className="space-y-2">
+              <Label htmlFor="expertise">Field Of Expertise</Label>
+              <select
+                id="expertise"
+                name="expertise"
+                value={formData.expertise}
+                onChange={handleInputChange}
+                required
+                disabled={isLoading}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary !text-black"
+                style={{ color: "#000" }}
+              >
+                <option value="" className="text-black">Select your expertise</option>
+                <option value="Tech" className="text-black">Tech</option>
+                <option value="Business" className="text-black">Business</option>
+                <option value="Content building" className="text-black">Content building</option>
+                <option value="Data" className="text-black">Data</option>
+                <option value="Other" className="text-black">Other</option>
+              </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>

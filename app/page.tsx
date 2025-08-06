@@ -29,10 +29,13 @@ export default function Home() {
         <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-24">
           <div className="max-w-[600px]">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
-              Simplify Your Project Management
+              Simplify Venture Building.
             </h1>
+          <h3 className="text-2xl italic tracking-tighter sm:text-3xl md:text-4xl text-white">
+            Where Talents Meet Projects. Where Projects Meet Capital.
+          </h3>
             <p className="mt-4 text-lg text-gray-400 max-w-[550px]">
-              LPX helps you manage your projects, teams, and agreements in one place. Get started today.
+              LPX simplifies how you build, contribute, and get funded — all in one ecosystem.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Link href="/signup">
