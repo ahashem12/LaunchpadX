@@ -4,7 +4,7 @@ import { Download, Eye, Trash2, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { UploadButton } from "./UploadButton"
 import { DocumentService } from "@/app/services/document/document-service"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import type { Document } from "@/types/documents"
 
 interface DocumentActionsProps {
@@ -20,6 +20,7 @@ export function DocumentActions({
   onReplaceSuccess,
   showReplace = false,
 }: DocumentActionsProps) {
+  const { toast } = useToast()
   const handleView = () => {
     if (document.file_url) {
       window.open(document.file_url, "_blank")
@@ -30,10 +31,10 @@ export function DocumentActions({
     try {
       const isPrivate = document.privacy === "private"
       await DocumentService.downloadFile(document.file_url, document.file_name, isPrivate)
-      toast.success(`Downloaded ${document.title}`)
+      toast({ title: "Success", description: `Downloaded ${document.title}` })
     } catch (error) {
       console.error("Download error:", error)
-      toast.error(error instanceof Error ? error.message : "Download failed")
+      toast({ title: "Error", description: error instanceof Error ? error.message : "Download failed", variant: "destructive" })
     }
   }
 

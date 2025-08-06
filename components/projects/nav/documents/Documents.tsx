@@ -7,9 +7,10 @@ import { DocumentsSection } from "./DocumentsSection"
 import { PrivateDocumentsUpload } from "./PrivateDocumentsUpload"
 import type { Document, PredefinedDocument } from "@/types/documents"
 import { DocumentService } from "@/app/services/document/document-service"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 
 export function Documents() {
+  const { toast } = useToast()
   const params = useParams()
   const projectId = params?.id as string
 
@@ -47,7 +48,7 @@ export function Documents() {
       setDocuments(docs)
     } catch (error) {
       console.error("Failed to load documents:", error)
-      toast.error("Failed to load documents")
+      toast({ title: "Error", description: "Failed to load documents", variant: "destructive" })
     } finally {
       setIsLoading(false)
     }

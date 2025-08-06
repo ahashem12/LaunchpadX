@@ -17,7 +17,7 @@ export default async function AgreementPage(props: AgreementPageProps) {
       <div className="mt-8">
         {/* <h1 className="text-2xl font-bold text-white">Agreement</h1> */}
         {/* <p className="mt-4 text-gray-400">This page is under construction.</p> */}
-        <Agreement />
+        <Agreement projectId={params.id} />
       </div>
     </div>
   )

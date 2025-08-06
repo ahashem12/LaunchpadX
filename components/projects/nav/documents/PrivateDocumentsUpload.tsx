@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { UploadButton } from "./UploadButton"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 
 interface PrivateDocumentsUploadProps {
   projectId: string
@@ -14,6 +14,7 @@ interface PrivateDocumentsUploadProps {
 }
 
 export function PrivateDocumentsUpload({ projectId, onUploadSuccess }: PrivateDocumentsUploadProps) {
+  const { toast } = useToast()
   const [documentTitle, setDocumentTitle] = useState("")
   const [isPrivate, setIsPrivate] = useState(true)
   const [isTitleValid, setIsTitleValid] = useState(true)
@@ -22,7 +23,7 @@ export function PrivateDocumentsUpload({ projectId, onUploadSuccess }: PrivateDo
     setDocumentTitle("")
     setIsPrivate(true)
     setIsTitleValid(true)
-    toast.success(`${document.title} uploaded successfully!`)
+    toast({ title: "Success", description: `${document.title} uploaded successfully!` })
 
     if (onUploadSuccess) {
       onUploadSuccess()

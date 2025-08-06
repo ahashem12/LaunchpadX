@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { DocumentService } from "@/app/services/document/document-service"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import type { Document } from "@/types/documents"
 
 interface DeleteDocumentDialogProps {
@@ -24,6 +24,7 @@ interface DeleteDocumentDialogProps {
 }
 
 export function DeleteDocumentDialog({ document, open, onOpenChange, onDeleteSuccess }: DeleteDocumentDialogProps) {
+  const { toast } = useToast()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDeleteConfirm = async () => {
@@ -32,7 +33,7 @@ export function DeleteDocumentDialog({ document, open, onOpenChange, onDeleteSuc
     try {
       setIsDeleting(true)
       await DocumentService.deleteDocument(document.id)
-      toast.success(`${document.title} deleted successfully`)
+      toast({ title: "Success", description: `${document.title} deleted successfully` })
 
       if (onDeleteSuccess) {
         onDeleteSuccess()
@@ -41,7 +42,7 @@ export function DeleteDocumentDialog({ document, open, onOpenChange, onDeleteSuc
       onOpenChange(false)
     } catch (error) {
       console.error("Delete error:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to delete document")
+      toast({ title: "Error", description: error instanceof Error ? error.message : "Failed to delete document", variant: "destructive" })
     } finally {
       setIsDeleting(false)
     }

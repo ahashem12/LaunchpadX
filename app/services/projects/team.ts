@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client"
-import type { TeamMember } from "@/types"
+import type { TeamMember, TeamRole } from "@/types"
 
 export async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
   try {
@@ -66,4 +66,40 @@ export async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
   } catch (error) {
     return []
   }
+}
+
+export async function getProjectRoles(projectId: string): Promise<TeamRole[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("roles")
+    .select("*, role_category:category_id(id, name)")
+    .eq("project_id", projectId)
+
+  if (error) {
+    console.error("Error getting project roles:", error)
+    return []
+  }
+
+  return data
+}
+
+export async function getRoleCategoryCounts(projectId: string): Promise<{ [key: string]: number }> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from("roles")
+    .select("role_category:category_id(name)")
+    .eq("project_id", projectId)
+
+  if (error) {
+    console.error("Error getting role category counts:", error)
+    return {}
+  }
+
+  const counts = data.reduce((acc: { [key: string]: number }, role: any) => {
+    const categoryName = role.role_category?.name || "Uncategorized"
+    acc[categoryName] = (acc[categoryName] || 0) + 1
+    return acc
+  }, {})
+
+  return counts
 }

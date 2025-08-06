@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { UploadButton } from "./UploadButton"
 import type { PredefinedDocument } from "@/types/documents"
-import { toast } from "sonner"
+import { useToast } from "@/hooks/use-toast"
 import { DocumentService } from "@/app/services/document/document-service"
 import { useState, useEffect } from "react"
 
@@ -16,6 +16,7 @@ interface DocumentCardProps {
 }
 
 export function DocumentCard({ document, projectId, onUploadSuccess }: DocumentCardProps) {
+  const { toast } = useToast()
   const [uploadedDoc, setUploadedDoc] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -47,7 +48,7 @@ export function DocumentCard({ document, projectId, onUploadSuccess }: DocumentC
   }
 
   const handleGenerateWithAI = () => {
-    toast.info(`Generating ${document.name} with AI...`)
+    toast({ title: "Generating Document", description: `Generating ${document.name} with AI...` })
   }
 
   const handleView = () => {
@@ -61,10 +62,10 @@ export function DocumentCard({ document, projectId, onUploadSuccess }: DocumentC
       try {
         const isPrivate = uploadedDoc.privacy === "private"
         await DocumentService.downloadFile(uploadedDoc.file_url, uploadedDoc.file_name, isPrivate)
-        toast.success(`Downloaded ${document.name}`)
+        toast({ title: "Success", description: `Downloaded ${document.name}` })
       } catch (error) {
         console.error("Download error:", error)
-        toast.error(error instanceof Error ? error.message : "Download failed")
+        toast({ title: "Error", description: error instanceof Error ? error.message : "Download failed", variant: "destructive" })
       }
     }
   }

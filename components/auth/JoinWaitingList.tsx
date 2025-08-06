@@ -19,11 +19,13 @@ export function JoinWaitingList() {
     familyName: "",
     email: "",
     phoneNumber: "",
+    password: "",
+    confirmPassword: "",
     city: "",
     expertise: "",
     joiningReason: "",       // single choice
   })
-  const [errors, setErrors] = useState({ phoneNumber: "" })
+  const [errors, setErrors] = useState({ phoneNumber: "", password: "" })
   const supabase = createClient()
   const router = useRouter()
 
@@ -35,35 +37,55 @@ export function JoinWaitingList() {
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
     }
+    if (name === "confirmPassword" && errors.password) {
+      setErrors({ ...errors, password: "" })
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ ...errors, password: "Passwords do not match." })
+      return
+    }
+
     const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
     if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
-      setErrors({ phoneNumber: "Please enter a valid phone number." })
+      setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
       return
     }
 
     setIsLoading(true)
 
-    const { error } = await supabase
-      .from("waiting_list")
-      .insert({
-        name: formData.name,
-        familyName: formData.familyName,
-        email: formData.email,
-        phone: formData.phoneNumber,
-        city: formData.city,
-        expertise: formData.expertise,
-        joiningReason: formData.joiningReason,
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (signUpError) {
+      setIsLoading(false)
+      toast({
+        title: "Error",
+        description: signUpError.message,
+        variant: "destructive",
       })
+      return
+    }
+
+    const { error: insertError } = await supabase.from("waiting_list").insert({
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phoneNumber,
+    })
 
     setIsLoading(false)
 
-    if (error) {
-      console.error("Error inserting into waiting list:", error)
+    if (insertError) {
+      console.error("Error inserting into waiting list:", insertError)
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -83,7 +105,9 @@ export function JoinWaitingList() {
           <CardHeader className="items-center text-center">
             <Logo />
             <CardTitle className="text-2xl">Thank You!</CardTitle>
-            <CardDescription>You've joined the waiting list.</CardDescription>
+            <CardDescription>
+              Please check your email to confirm your account. You will be notified once an admin has approved your request.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -197,33 +221,33 @@ export function JoinWaitingList() {
                 <option value="Other" className="text-black">Other</option>
               </select>
             </div>
-
-            {/* Joining Reason (single-choice radios) */}
             <div className="space-y-2">
-              <Label>Are you joining LPX to:</Label>
-              <div className="flex flex-col pl-2 space-y-1">
-                {[
-                  "Be matched with projects",
-                  "Build Projects",
-                  'Contribute Expertise - "Know how"',
-                  "Become a Partner",
-                ].map(reason => (
-                  <label key={reason} className="inline-flex items-center">
-                    <input
-                      type="radio"
-                      name="joiningReason"
-                      value={reason}
-                      checked={formData.joiningReason === reason}
-                      onChange={handleInputChange}
-                      disabled={isLoading}
-                      className="mr-2"
-                    />
-                    {reason}
-                  </label>
-                ))}
-              </div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="••••••••"
+                required
+                disabled={isLoading}
+              />
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                placeholder="••••••••"
+                required
+                disabled={isLoading}
+              />
+              {errors.password && <p className="text-sm text-red-500 pt-1">{errors.password}</p>}
+            </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Joining..." : "Join Now"}
             </Button>
