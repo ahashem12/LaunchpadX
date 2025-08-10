@@ -53,6 +53,23 @@ export async function getUserProjects(): Promise<Project[]> {
   }
 }
 
+export async function getAllProjects(): Promise<Project[]> {
+  try {
+    const supabase = createClient()
+    const { data, error } = await supabase.from("projects").select("*")
+
+    if (error) {
+      console.error("Error getting all projects:", error)
+      return []
+    }
+
+    return data as Project[]
+  } catch (error) {
+    console.error("Unexpected error getting all projects:", error)
+    return []
+  }
+}
+
 export async function getProjectRoles(projectId: string): Promise<TeamRole[]> {
   try {
     if (!validateProjectId(projectId)) {

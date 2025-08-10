@@ -22,7 +22,7 @@ export default function BrowsePage() {
   const loadProjects = async () => {
     setLoading(true)
     try {
-      const allProjects = await projectService.getUserProjects()
+      const allProjects = await projectService.getAllProjects()
       setProjects(allProjects)
       setFilteredProjects(allProjects)
     } catch (error) {
