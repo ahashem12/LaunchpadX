@@ -7,6 +7,7 @@ import type { TeamRole } from "@/types"
 
 export default function OpenRolesPage() {
   const [roles, setRoles] = useState<TeamRole[]>([])
+  const [userProjectIds, setUserProjectIds] = useState<Set<string>>(new Set())
   const [searchQuery, setSearchQuery] = useState("")
   const [roleType, setRoleType] = useState("all")
   const [category, setCategory] = useState("all")
@@ -15,8 +16,12 @@ export default function OpenRolesPage() {
 
   useEffect(() => {
     const fetchRoles = async () => {
-      const openRoles = await projectService.getAllOpenRoles()
-      setRoles(openRoles)
+      Promise.all([projectService.getAllOpenRoles(), projectService.getUserProjects()])
+        .then(([allRoles, userProjects]) => {
+          setRoles(allRoles)
+          setUserProjectIds(new Set(userProjects.map((p) => p.id)))
+        })
+        .catch((err) => console.error("Error fetching roles:", err))
     }
     fetchRoles()
   }, [])
@@ -100,7 +105,7 @@ export default function OpenRolesPage() {
           setSortBy={setSortBy}
         />
 
-        <RolesGrid roles={filteredRoles} />
+        <RolesGrid roles={filteredRoles} userProjectIds={userProjectIds} />
       </div>
     </div>
   )

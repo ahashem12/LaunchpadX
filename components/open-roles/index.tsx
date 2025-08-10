@@ -1,4 +1,4 @@
 export { OpenRolesHeader } from "./OpenRolesHeader"
 export { OpenRolesFilters } from "./OpenRolesFilters"
-export { RolesGrid } from "./RolesGrids"
+export { RolesGrid } from "./RolesGrid"
 export { RoleCard } from "./RoleCard"
