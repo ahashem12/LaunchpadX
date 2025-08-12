@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import type { ProfileData, ProfileUpdateInput } from "@/types/profile";
+import type { Profile, ProfileUpdateInput } from "@/types/profile";
 
 export class ProfileService {
   private static supabase = createClient();
@@ -7,7 +7,7 @@ export class ProfileService {
   private static readonly ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-  static async getCurrentUserProfile(): Promise<{ data: ProfileData | null; error: string | null }> {
+  static async getCurrentUserProfile(): Promise<{ data: Profile | null; error: string | null }> {
     try {
       const { data: { user }, error: authError } = await this.supabase.auth.getUser();
       if (authError || !user) {
@@ -21,13 +21,13 @@ export class ProfileService {
         .single();
 
       if (error) return { data: null, error: error.message };
-      return { data: data as ProfileData, error: null };
+      return { data: data as Profile, error: null };
     } catch {
       return { data: null, error: "Failed to fetch profile" };
     }
   }
 
-  static async updateProfile(updates: ProfileUpdateInput): Promise<{ data: ProfileData | null; error: string | null }> {
+  static async updateProfile(updates: ProfileUpdateInput): Promise<{ data: Profile | null; error: string | null }> {
     try {
       const { data: { user }, error: authError } = await this.supabase.auth.getUser();
       if (authError || !user) {
@@ -45,7 +45,7 @@ export class ProfileService {
         .single();
 
       if (error) return { data: null, error: error.message };
-      return { data: data as ProfileData, error: null };
+      return { data: data as Profile, error: null };
     } catch {
       return { data: null, error: "Failed to update profile" };
     }
@@ -110,7 +110,7 @@ export class ProfileService {
   static async updateProfileWithPicture(
     updates: ProfileUpdateInput,
     file?: File
-  ): Promise<{ data: ProfileData | null; error: string | null }> {
+  ): Promise<{ data: Profile | null; error: string | null }> {
     try {
       const { data: { user }, error: authError } = await this.supabase.auth.getUser();
       if (authError || !user) {
@@ -151,7 +151,7 @@ export class ProfileService {
         await this.deleteProfilePicture(oldPictureUrl);
       }
 
-      return { data: data as ProfileData, error: null };
+      return { data: data as Profile, error: null };
     } catch (err) {
       return { 
         data: null, 

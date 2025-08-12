@@ -10,13 +10,20 @@ import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
 interface ProfilePictureSectionProps {
-  currentUrl: string
-  onFileSelect: (file: File) => void
-  onRemove: () => void
-  hasImage: boolean
+  avatarUrl: string | null;
+  onFileSelect: (file: File) => void;
+  onRemove: () => void;
+  hasImage: boolean;
+  isEditable?: boolean;
 }
 
-export function ProfilePictureSection({ currentUrl, onFileSelect, onRemove, hasImage }: ProfilePictureSectionProps) {
+export function ProfilePictureSection({
+  avatarUrl,
+  onFileSelect,
+  onRemove,
+  hasImage,
+  isEditable = true,
+}: ProfilePictureSectionProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
@@ -92,14 +99,16 @@ export function ProfilePictureSection({ currentUrl, onFileSelect, onRemove, hasI
     })
   }
 
-  const showRemoveButton = hasImage && currentUrl && currentUrl !== ""
+  const showRemoveButton = hasImage && avatarUrl && avatarUrl !== "" && isEditable;
 
   return (
     <div className="xl:col-span-1">
       <div className="bg-card rounded-lg border p-6 space-y-6">
         <div>
           <h3 className="text-lg font-semibold">Profile Picture</h3>
-          <p className="text-sm text-muted-foreground mt-1">Update your profile photo</p>
+          {isEditable && (
+            <p className="text-sm text-muted-foreground mt-1">Update your profile photo</p>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -107,9 +116,9 @@ export function ProfilePictureSection({ currentUrl, onFileSelect, onRemove, hasI
             <div className="relative group">
               <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
                 <AvatarImage 
-                  src={currentUrl} 
+                  src={avatarUrl || "/images/default-avatar.png"} 
                   alt="Profile picture" 
-                  className={currentUrl ? "object-cover" : "hidden"}
+                  className={avatarUrl ? "object-cover" : "hidden"}
                 />
                 <AvatarFallback className="bg-muted">
                   <User className="h-12 w-12 text-muted-foreground" />
@@ -129,29 +138,33 @@ export function ProfilePictureSection({ currentUrl, onFileSelect, onRemove, hasI
             </div>
           </div>
 
-          <div
-            className={cn(
-              "border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer",
-              isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50",
-            )}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onClick={triggerFileInput}
-          >
-            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
-            <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
-          </div>
+          {isEditable && (
+            <>
+              <div
+                className={cn(
+                  "border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer",
+                  isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50",
+                )}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={triggerFileInput}
+              >
+                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
+                <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</p>
+              </div>
 
-          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleInputChange} className="hidden" />
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleInputChange} className="hidden" />
 
-          <Button onClick={triggerFileInput} variant="outline" className="w-full bg-transparent">
-            <Upload className="h-4 w-4 mr-2" />
-            Choose Image
-          </Button>
+              <Button onClick={triggerFileInput} variant="outline" className="w-full bg-transparent">
+                <Upload className="h-4 w-4 mr-2" />
+                Choose Image
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
