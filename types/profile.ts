@@ -21,4 +21,6 @@ export interface ProfileUpdateInput {
   avatar_url?: string;
   banner_url?: string;
   bio?: string;
+  wallet_address?: string | null;
+  profile_picture?: string;
 }

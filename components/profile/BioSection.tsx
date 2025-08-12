@@ -5,10 +5,11 @@ import { BookUser } from 'lucide-react';
 
 interface BioSectionProps {
   bio: string;
-  onBioChange: (bio: string) => void;
+  onBioChange?: (bio: string) => void;
+  isEditable?: boolean;
 }
 
-export function BioSection({ bio, onBioChange }: BioSectionProps) {
+export function BioSection({ bio, onBioChange, isEditable = false }: BioSectionProps) {
   return (
     <Card>
       <CardHeader>
@@ -18,16 +19,30 @@ export function BioSection({ bio, onBioChange }: BioSectionProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-2">
+        {isEditable ? (
+          <div className="grid gap-2">
             <Label htmlFor="bio">Tell us about yourself</Label>
             <Textarea
-                id="bio"
-                placeholder="What makes you tick?"
-                value={bio}
-                onChange={(e) => onBioChange(e.target.value)}
-                rows={4}
+              id="bio"
+              placeholder="What makes you tick?"
+              value={bio}
+              onChange={(e) => onBioChange?.(e.target.value)}
+              rows={4}
             />
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {bio ? (
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {bio}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">
+                No bio available
+              </p>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -8,6 +8,8 @@ import { SkillsSection } from "./SkillsSection";
 import { WalletSection } from "./WalletSection";
 import { ReputationSection } from "./ReputationSection";
 import { AchievementsSection } from "./AchievementsSection";
+import { BannerSection } from "./BannerSection";
+import { BioSection } from "./BioSection";
 
 interface ProfileViewProps {
   profile: Profile;
@@ -15,9 +17,14 @@ interface ProfileViewProps {
 
 export function ProfileView({ profile }: ProfileViewProps) {
   return (
-    <div className="w-full bg-background">
-      <div className="container mx-auto">
-        <ProfileHeader error={null} />
+    <div className="space-y-8 max-w-5xl mx-auto py-10 px-4">
+      <ProfileHeader error={null} />
+      
+      <BannerSection
+        bannerUrl={profile.banner_url}
+        onBannerChange={() => {}}
+        isEditable={false}
+      />
 
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           <ProfilePictureSection
@@ -35,6 +42,7 @@ export function ProfileView({ profile }: ProfileViewProps) {
               isEditable={false}
             />
 
+            <BioSection bio={profile.bio || ""} isEditable={false} />
             <SkillsSection
               skills={profile.skills || []}
               isEditable={false}
@@ -47,7 +55,6 @@ export function ProfileView({ profile }: ProfileViewProps) {
             <AchievementsSection achievements={profile.achievements || []} />
           </div>
         </div>
-      </div>
     </div>
   );
 }

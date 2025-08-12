@@ -14,6 +14,7 @@ import { ReputationSection } from "./ReputationSection"
 import { AchievementsSection } from "./AchievementsSection"
 import { WalletAddressSection } from "./WalletAddressSection"
 import { ProfileActions } from "./ProfileActions"
+import { BannerSection } from "./BannerSection"
 
 export function ProfileForm() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -32,6 +33,9 @@ export function ProfileForm() {
 
   // Profile picture state
   const [newProfilePictureFile, setNewProfilePictureFile] = useState<File | null>(null)
+  
+  // Banner state
+  const [newBannerFile, setNewBannerFile] = useState<File | null>(null)
 
   const { toast } = useToast()
 
@@ -76,7 +80,8 @@ export function ProfileForm() {
     initialState?.bio !== bio ||
     JSON.stringify(initialState?.skills) !== JSON.stringify(skills) ||
     initialState?.wallet_address !== walletAddress ||
-    newProfilePictureFile !== null
+    newProfilePictureFile !== null ||
+    newBannerFile !== null
 
   const handleSave = async () => {
     if (!isDirty) return
@@ -89,9 +94,10 @@ export function ProfileForm() {
       wallet_address: walletAddress,
     }
 
-    const { data, error } = await ProfileService.updateProfileWithPicture(
+    const { data, error } = await ProfileService.updateProfileWithPictureAndBanner(
       updates,
-      newProfilePictureFile ?? undefined
+      newProfilePictureFile ?? undefined,
+      newBannerFile ?? undefined
     )
 
     if (error) {
@@ -101,6 +107,7 @@ export function ProfileForm() {
       const newInitialState = { ...initialState, ...data };
       setInitialState(newInitialState);
       setNewProfilePictureFile(null)
+      setNewBannerFile(null)
       toast({ title: "Profile saved successfully!" })
     }
     setSaving(false)
@@ -112,6 +119,7 @@ export function ProfileForm() {
     setSkills(initialState.skills || [])
     setWalletAddress(initialState.wallet_address || null)
     setNewProfilePictureFile(null)
+    setNewBannerFile(null)
     toast({ title: "Changes discarded" })
   }
 
@@ -122,6 +130,12 @@ export function ProfileForm() {
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-10 px-4">
       <ProfileHeader error={error} />
+      
+      <BannerSection
+        bannerUrl={profile.banner_url}
+        onBannerChange={setNewBannerFile}
+        isEditable={true}
+      />
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         <ProfilePictureSection
@@ -138,7 +152,7 @@ export function ProfileForm() {
             email={profile.email || ""}
             onUsernameChange={setUsername}
           />
-          <BioSection bio={bio} onBioChange={setBio} />
+          <BioSection bio={bio} onBioChange={setBio} isEditable={true} />
           <SkillsSection skills={skills} onChange={setSkills} />
         </div>
 
