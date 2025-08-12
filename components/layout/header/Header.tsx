@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Bell, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { WatermelonIcon } from "@/components/icons/WatermelonIcon"
+import { PigeonIcon } from "@/components/icons/PigeonIcon"
 // import { NavLinks } from "./NavLinks"
 import { WalletButton } from "./WalletButton"
 import { UserDropdown } from "./UserDropdown"
@@ -17,7 +17,7 @@ export function Header() {
         {/* Left side - Logo + Nav */}
         <div className="mr-4 hidden md:flex">
           {/* <Link href="/" className="mr-6 flex items-center space-x-2">
-            <WatermelonIcon className="h-6 w-6" />
+            <PigeonIcon className="h-6 w-6" />
             <span className="hidden font-bold sm:inline-block">LPX</span>
           </Link> */}
           {/* <NavLinks /> */}
