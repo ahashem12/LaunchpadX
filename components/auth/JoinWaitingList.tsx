@@ -111,8 +111,19 @@ export function JoinWaitingList() {
         variant: "destructive",
       })
     } else {
+      const { error: signOutError } = await supabase.auth.signOut()
+
+      if (signOutError) {
+        console.error("Error signing out:", signOutError)
+        toast({
+          title: "Logout Error",
+          description: "Could not log you out after signing up. Please try logging out manually.",
+          variant: "destructive",
+        })
+      }
+
       setIsSubmitted(true)
-      setTimeout(() => router.push("/"), 3000)
+      setTimeout(() => router.push("/login"), 5000)
     }
   }
 
