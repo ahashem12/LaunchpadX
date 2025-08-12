@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function BrowsePage() {
   const [projects, setProjects] = useState<Project[]>([])
+  const [userProjectIds, setUserProjectIds] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([])
   const [filters, setFilters] = useState({
@@ -22,9 +23,13 @@ export default function BrowsePage() {
   const loadProjects = async () => {
     setLoading(true)
     try {
-      const allProjects = await projectService.getUserProjects()
+      const [allProjects, userProjects] = await Promise.all([
+        projectService.getAllProjects(),
+        projectService.getUserProjects(),
+      ])
       setProjects(allProjects)
       setFilteredProjects(allProjects)
+      setUserProjectIds(new Set(userProjects.map(p => p.id)))
     } catch (error) {
       console.error("Error fetching projects:", error)
       setProjects([])
@@ -90,7 +95,7 @@ export default function BrowsePage() {
             ))}
           </div>
         ) : (
-          <ProjectBrowseGrid projects={filteredProjects} />
+          <ProjectBrowseGrid projects={filteredProjects} userProjectIds={userProjectIds} />
         )}
       </div>
     </div>

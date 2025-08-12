@@ -10,14 +10,19 @@ import { useRouter } from "next/navigation"
 import type { Project } from "@/types"
 
 interface ProjectBrowseCardProps {
-  project: Project
+  project: Project;
+  isMember: boolean;
 }
 
-export default function ProjectBrowseCard({ project }: ProjectBrowseCardProps) {
+export default function ProjectBrowseCard({ project, isMember }: ProjectBrowseCardProps) {
   const router = useRouter()
 
   const handleCardClick = () => {
-    router.push(`/projects/${project.id}`)
+    if (isMember) {
+      router.push(`/projects/${project.id}`)
+    } else {
+      router.push(`/browse/project/${project.id}`)
+    }
   }
 
   const handleFollowClick = (e: React.MouseEvent) => {
