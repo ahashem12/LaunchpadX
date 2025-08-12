@@ -2,7 +2,7 @@
 
 import { Edit, Camera } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { WatermelonIcon } from "@/components/icons/WatermelonIcon"
+import { PigeonIcon } from "@/components/icons/PigeonIcon"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,10 +42,10 @@ export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
         <>
           {/* Watermelon Icons */}
           <div className="absolute bottom-4 right-4 opacity-90">
-            <WatermelonIcon size={80} className="rotate-[145deg]" />
+            <PigeonIcon size={80} className="" />
           </div>
           <div className="absolute top-4 left-4 opacity-90">
-            <WatermelonIcon size={80} className="-rotate-45" />
+            <PigeonIcon size={80} className="" />
           </div>
         </>
       )}

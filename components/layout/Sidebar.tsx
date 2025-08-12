@@ -14,7 +14,7 @@ import {
   ChevronLeft,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { WatermelonIcon } from "../icons/WatermelonIcon"
+import { PigeonIcon } from "../icons/PigeonIcon"
 
 interface SidebarProps {
   isCollapsed: boolean
@@ -81,7 +81,7 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     >
       <div className="h-16 border-b border-border flex items-center px-4">
         <Link href="/" className="flex items-center gap-2">
-          <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+          <PigeonIcon size={32} className="text-white" /> {/* Replaced PNG with SVG */}
           {!isCollapsed && <span className="text-xl font-bold text-white">LPX</span>}
         </Link>
         <button onClick={onToggle} className="ml-auto text-gray-400 hover:text-white">

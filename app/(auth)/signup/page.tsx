@@ -1,6 +1,6 @@
 import { JoinWaitingList } from "@/components/auth/JoinWaitingList"
 import Link from "next/link"
-import { WatermelonIcon } from "@/components/icons/WatermelonIcon"
+import { PigeonIcon } from "@/components/icons/PigeonIcon" 
 import { Button } from "@/components/ui/button"
 
 export default function SignupPage() {
@@ -9,7 +9,7 @@ export default function SignupPage() {
       <header className="w-full border-b border-border">
         <div className="container flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <WatermelonIcon size={32} className="text-white rotate-[145deg]" />
+            <PigeonIcon size={32} className="text-white" />
             <span className="text-xl font-bold text-white">LPX</span>
           </Link>
           <nav className="flex items-center gap-4">

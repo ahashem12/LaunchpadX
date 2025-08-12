@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { WatermelonIcon } from "@/components/icons/WatermelonIcon" // Import your SVG component
+import { PigeonIcon } from "@/components/icons/PigeonIcon" // Import your SVG component
 
 export default function Home() {
   return (
@@ -8,7 +8,7 @@ export default function Home() {
       <header className="w-full border-b border-border">
         <div className="container flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <WatermelonIcon size={32} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+            <PigeonIcon size={32} className="text-white" /> {/* Replaced PNG with SVG */}
             <span className="text-xl font-bold text-white">LPX</span>
           </Link>
           <nav className="flex items-center gap-4">
@@ -56,7 +56,7 @@ export default function Home() {
         </div>
         <div className="hidden lg:block lg:w-[40%] bg-gradient-to-br from-blue-500 to-purple-600 relative">
           <div className="absolute bottom-1/4 right-1/4">
-            <WatermelonIcon size={180} className="text-white rotate-[145deg]" /> {/* Replaced PNG with SVG */}
+            <PigeonIcon size={180} className="text-white" /> {/* Replaced PNG with SVG */}
           </div>
         </div>
       </main>
