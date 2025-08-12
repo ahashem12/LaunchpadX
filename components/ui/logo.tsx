@@ -1,9 +1,9 @@
-import { WatermelonIcon } from "@/components/icons/WatermelonIcon"
+import { PigeonIcon } from "@/components/icons/PigeonIcon"
 
 export function Logo() {
   return (
     <div className="flex items-center gap-2">
-      <WatermelonIcon size={32} className="text-white rotate-[145deg]" />
+      <PigeonIcon size={32} className="text-white" />
       <span className="text-xl font-bold text-white">LPX</span>
     </div>
   )
