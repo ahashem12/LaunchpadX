@@ -6,6 +6,16 @@ export async function middleware(request: NextRequest) {
   // Update the session first
   const response = await updateSession(request)
 
+  const root = request.nextUrl;
+  if (root.pathname === '/' && root.searchParams.has('code')) {
+    const redirectUrl = new URL('/callback', request.url);
+    redirectUrl.search = root.search;
+    if (!redirectUrl.searchParams.has('next')) {
+      redirectUrl.searchParams.set('next', '/change-password');
+    }
+    return NextResponse.redirect(redirectUrl);
+  }
+
   // Add this near the top of the middleware function, after the updateSession call
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -95,5 +105,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
-}
+    matcher: [
+      '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
+  };

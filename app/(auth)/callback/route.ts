@@ -4,23 +4,22 @@ import { NextResponse } from "next/server"
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
+  const next = requestUrl.searchParams.get("next") || "/change-password" 
 
-  if (code) {
-    const supabase = createClient()
-    const { data, error } = await (await supabase).auth.exchangeCodeForSession(code)
-
-    // Log the result for debugging (this will appear in server logs)
-    console.log("Session exchange result:", {
-      success: !!data.session,
-      error: error?.message,
-    })
-
-    if (error) {
-      console.error("Error exchanging code for session:", error)
-      // Even if there's an error, we'll redirect to dashboard and let the middleware handle authentication
-    }
+  if (!code) {
+    return NextResponse.redirect(new URL("/forgot-password?error=missing_code", requestUrl.origin)) 
   }
 
-  // Redirect to dashboard after authentication
-  return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+  const supabase = await createClient() 
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code) 
+
+  console.log("Session exchange result:", { success: !!data?.session, error: error?.message })
+
+  if (error) {
+    return NextResponse.redirect(
+      new URL(`/forgot-password?error=${encodeURIComponent(error.message)}`, requestUrl.origin),
+    ) 
+  }
+
+  return NextResponse.redirect(new URL(next, requestUrl.origin))
 }
