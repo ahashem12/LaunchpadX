@@ -3,291 +3,172 @@
 import { useState, useEffect } from "react"
 import { ProfileService } from "@/app/services/profile/profile-service"
 import { useToast } from "@/hooks/use-toast"
-import type { ProfileData } from "@/types/profile"
+import type { Profile, ProfileUpdateInput } from "@/types/profile"
 import { ProfileLoading } from "./ProfileLoading"
 import { ProfileHeader } from "./ProfileHeader"
 import { ProfilePictureSection } from "./ProfilePictureSection"
 import { PersonalInfoSection } from "./PersonalInfoSection"
+import { BioSection } from "./BioSection"
 import { SkillsSection } from "./SkillsSection"
-import { WalletSection } from "./WalletSection"
+import { ReputationSection } from "./ReputationSection"
+import { AchievementsSection } from "./AchievementsSection"
+import { WalletAddressSection } from "./WalletAddressSection"
 import { ProfileActions } from "./ProfileActions"
+import { BannerSection } from "./BannerSection"
 
 export function ProfileForm() {
-  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Form state
-  const [formData, setFormData] = useState({
-    username: "",
-    skills: [] as string[],
-    profile_picture: "",
-  })
+  // Form data state
+  const [username, setUsername] = useState("")
+  const [bio, setBio] = useState("")
+  const [skills, setSkills] = useState<string[]>([])
+  const [walletAddress, setWalletAddress] = useState<string | null>(null)
 
-  // Track changes
-  const [originalData, setOriginalData] = useState({
-    username: "",
-    skills: [] as string[],
-    profile_picture: "",
-  })
+  // Track original state for changes
+  const [initialState, setInitialState] = useState<Partial<Profile>>({})
 
   // Profile picture state
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string>("")
-  const [isImageDeleted, setIsImageDeleted] = useState(false)
+  const [newProfilePictureFile, setNewProfilePictureFile] = useState<File | null>(null)
+  
+  // Banner state
+  const [newBannerFile, setNewBannerFile] = useState<File | null>(null)
 
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
   const { toast } = useToast()
 
   useEffect(() => {
-    loadProfile()
-  }, [])
+    async function loadProfile() {
+      try {
+        setLoading(true)
+        const { data, error } = await ProfileService.getCurrentUserProfile()
 
-  useEffect(() => {
-    return () => {
-      if (previewUrl && previewUrl.startsWith("blob:")) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [previewUrl])
+        if (error) throw new Error(error)
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const { data, error } = await ProfileService.getCurrentUserProfile()
-
-      if (error) {
-        setError(error)
-        return
-      }
-
-      if (data) {
-        const profileData = {
-          username: data.username || "",
-          skills: data.skills || [],
-          profile_picture: data.profile_picture || "",
+        if (data) {
+          setProfile(data)
+          // Set initial state for form fields and for tracking changes
+          const initial = {
+            username: data.username || "",
+            bio: data.bio || "",
+            skills: data.skills || [],
+            wallet_address: data.wallet_address || null,
+            avatar_url: data.avatar_url || null,
+            banner_url: data.banner_url || null,
+          }
+          setInitialState(initial)
+          setUsername(initial.username)
+          setBio(initial.bio)
+          setSkills(initial.skills)
+          setWalletAddress(initial.wallet_address)
         }
-
-        setProfile(data)
-        setFormData(profileData)
-        setOriginalData(profileData)
-        setIsImageDeleted(false)
-        setSelectedFile(null)
-        setPreviewUrl("")
+      } catch (err: any) {
+        setError(err.message)
+        toast({ title: "Error loading profile", description: err.message, variant: "destructive" })
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      setError("Failed to load profile")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const validateForm = (): boolean => {
-    const errors: Record<string, string> = {}
-
-    if (!formData.username.trim()) {
-      errors.username = "Username is required"
-    } else if (formData.username.length < 2) {
-      errors.username = "Username must be at least 2 characters"
-    } else if (formData.username.length > 50) {
-      errors.username = "Username must be less than 50 characters"
     }
 
-    setValidationErrors(errors)
-    return Object.keys(errors).length === 0
-  }
+    loadProfile()
+  }, [toast])
 
-  const hasChanges = (): boolean => {
-    return (
-      formData.username !== originalData.username ||
-      JSON.stringify(formData.skills) !== JSON.stringify(originalData.skills) ||
-      selectedFile !== null ||
-      isImageDeleted
-    )
-  }
+  const isDirty =
+    initialState?.username !== username ||
+    initialState?.bio !== bio ||
+    JSON.stringify(initialState?.skills) !== JSON.stringify(skills) ||
+    initialState?.wallet_address !== walletAddress ||
+    newProfilePictureFile !== null ||
+    newBannerFile !== null
 
   const handleSave = async () => {
-    if (!validateForm()) return
+    if (!isDirty) return
+    setSaving(true)
 
-    if (!hasChanges()) {
-      toast({
-        title: "No changes to save",
-        description: "Your profile is already up to date.",
-      })
-      return
+    const updates: ProfileUpdateInput = {
+      username,
+      bio,
+      skills,
+      wallet_address: walletAddress,
     }
 
-    try {
-      setSaving(true)
-      setError(null)
+    const { data, error } = await ProfileService.updateProfileWithPictureAndBanner(
+      updates,
+      newProfilePictureFile ?? undefined,
+      newBannerFile ?? undefined
+    )
 
-      let finalProfilePicture = formData.profile_picture
-
-      // Handle profile picture deletion
-      if (isImageDeleted && originalData.profile_picture) {
-        const { error: deleteError } = await ProfileService.deleteProfilePicture(originalData.profile_picture)
-        if (deleteError) {
-          throw new Error(deleteError)
-        }
-        finalProfilePicture = ""
-      }
-
-      // Handle new profile picture upload
-      if (selectedFile) {
-        // If there was an old image and we're replacing it, delete it first
-        if (originalData.profile_picture && !isImageDeleted) {
-          await ProfileService.deleteProfilePicture(originalData.profile_picture)
-        }
-
-        const { url, error } = await ProfileService.uploadProfilePicture(selectedFile)
-        if (error) throw new Error(error)
-        if (url) finalProfilePicture = url
-      }
-
-      const { data, error } = await ProfileService.updateProfile({
-        username: formData.username,
-        skills: formData.skills,
-        profile_picture: finalProfilePicture,
-      })
-
-      if (error) throw new Error(error)
-
-      if (data) {
-        const updatedData = {
-          username: data.username || "",
-          skills: data.skills || [],
-          profile_picture: data.profile_picture || "",
-        }
-
-        setProfile(data)
-        setFormData(updatedData)
-        setOriginalData(updatedData)
-        setSelectedFile(null)
-        setIsImageDeleted(false)
-        if (previewUrl && previewUrl.startsWith("blob:")) {
-          URL.revokeObjectURL(previewUrl)
-        }
-        setPreviewUrl("")
-
-        toast({
-          title: "Profile updated",
-          description: "Your changes have been saved successfully.",
-        })
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update profile"
-      setError(errorMessage)
-      toast({
-        variant: "destructive",
-        title: "Update failed",
-        description: errorMessage,
-      })
-    } finally {
-      setSaving(false)
+    if (error) {
+      toast({ title: "Error saving profile", description: error, variant: "destructive" })
+    } else if (data) {
+      setProfile(data)
+      const newInitialState = { ...initialState, ...data };
+      setInitialState(newInitialState);
+      setNewProfilePictureFile(null)
+      setNewBannerFile(null)
+      toast({ title: "Profile saved successfully!" })
     }
+    setSaving(false)
   }
 
   const handleDiscard = () => {
-    setFormData(originalData)
-    setSelectedFile(null)
-    setIsImageDeleted(false)
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl)
-    }
-    setPreviewUrl("")
-    setValidationErrors({})
-
-    toast({
-      title: "Changes discarded",
-      description: "All changes have been reverted.",
-    })
+    setUsername(initialState.username || "")
+    setBio(initialState.bio || "")
+    setSkills(initialState.skills || [])
+    setWalletAddress(initialState.wallet_address || null)
+    setNewProfilePictureFile(null)
+    setNewBannerFile(null)
+    toast({ title: "Changes discarded" })
   }
 
-  const handleFileSelect = (file: File) => {
-    setSelectedFile(file)
-    setIsImageDeleted(false)
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl)
-    }
-    setPreviewUrl(URL.createObjectURL(file))
-  }
-
-  const handleImageRemove = () => {
-    setSelectedFile(null)
-    setIsImageDeleted(true)
-    if (previewUrl && previewUrl.startsWith("blob:")) {
-      URL.revokeObjectURL(previewUrl)
-    }
-    setPreviewUrl("")
-  }
-
-  const getCurrentImageUrl = () => {
-    if (previewUrl) return previewUrl
-    if (isImageDeleted) return ""
-    return formData.profile_picture || ""
-  }
-
-  const hasCurrentImage = () => {
-    if (previewUrl) return true
-    if (isImageDeleted) return false
-    return !!formData.profile_picture
-  }
-
-  if (loading) {
-    return <ProfileLoading />
-  }
-
-  if (error && !profile) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center p-6">
-        <div className="text-center space-y-4 max-w-md">
-          <div className="text-destructive text-lg font-medium">Failed to load profile</div>
-          <p className="text-muted-foreground">{error}</p>
-          <button onClick={loadProfile} className="px-4 py-2 bg-primary text-primary-foreground rounded-md">
-            Try Again
-          </button>
-        </div>
-      </div>
-    )
-  }
+  if (loading) return <ProfileLoading />
+  if (error) return <div className="text-center text-destructive py-10">Error: {error}</div>
+  if (!profile) return <div className="text-center text-muted-foreground py-10">Could not load profile.</div>
 
   return (
-    <div className="w-full bg-background">
-      <div className="container mx-auto">
-        <ProfileHeader error={error} />
+    <div className="space-y-8 max-w-5xl mx-auto py-10 px-4">
+      <ProfileHeader error={error} />
+      
+      <BannerSection
+        bannerUrl={profile.banner_url}
+        onBannerChange={setNewBannerFile}
+        isEditable={true}
+      />
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-          <ProfilePictureSection
-            currentUrl={getCurrentImageUrl()}
-            onFileSelect={handleFileSelect}
-            onRemove={handleImageRemove}
-            hasImage={hasCurrentImage()}
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <ProfilePictureSection
+          avatarUrl={profile.avatar_url}
+          onFileSelect={setNewProfilePictureFile}
+          onRemove={() => { /* TODO: Implement remove logic if needed */ }}
+          hasImage={!!profile.avatar_url}
+          isEditable={true}
+        />
+
+        <div className="xl:col-span-2 space-y-6">
+          <PersonalInfoSection
+            username={username}
+            email={profile.email || ""}
+            onUsernameChange={setUsername}
           />
+          <BioSection bio={bio} onBioChange={setBio} isEditable={true} />
+          <SkillsSection skills={skills} onChange={setSkills} />
+        </div>
 
-          <div className="xl:col-span-2 space-y-6">
-            <PersonalInfoSection
-              username={formData.username}
-              email={profile?.email || ""}
-              validationErrors={validationErrors}
-              onUsernameChange={(username) => setFormData((prev) => ({ ...prev, username }))}
-            />
-
-            <SkillsSection
-              skills={formData.skills}
-              onChange={(skills) => setFormData((prev) => ({ ...prev, skills }))}
-            />
-          </div>
-
-          <div className="xl:col-span-1 space-y-6">
-            <WalletSection walletAddress={profile?.wallet_address || ""} />
-
-            <ProfileActions onSave={handleSave} onDiscard={handleDiscard} saving={saving} hasChanges={hasChanges()} />
-          </div>
+        <div className="xl:col-span-1 space-y-6">
+          <ReputationSection reputation={profile.reputation} />
+          <AchievementsSection achievements={profile.achievements} />
+          <WalletAddressSection walletAddress={walletAddress} onWalletAddressChange={setWalletAddress} />
         </div>
       </div>
+
+      <ProfileActions
+        onSave={handleSave}
+        onDiscard={handleDiscard}
+        saving={saving}
+        hasChanges={isDirty}
+      />
     </div>
   )
 }

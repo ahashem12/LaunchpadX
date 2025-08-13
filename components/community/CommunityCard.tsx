@@ -1,9 +1,12 @@
 import type { Profile } from "@/types";
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Flame, Star, HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Flame, Star, HelpCircle, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CommunityCardProps {
   member: Profile;
@@ -19,16 +22,24 @@ const AchievementIcon = ({ achievement }: { achievement: string }) => (
 );
 
 const ReputationBar = ({ reputation }: { reputation: number }) => (
-  <div className="flex items-center gap-1.5 mt-4">
+  <div className="flex items-center justify-between">
     <div className="flex items-center gap-1">
-      {[...Array(10)].map((_, i) => (
-        <Flame
-          key={i}
-          className={`w-5 h-5 transition-colors ${i < reputation ? "text-amber-500 fill-amber-400" : "text-muted-foreground/30"}`}
-        />
-      ))}
+      <span className="text-xs font-medium text-muted-foreground">Reputation</span>
+      <div className="flex items-center gap-0.5">
+        {[...Array(5)].map((_, i) => (
+          <Flame
+            key={i}
+            className={cn(
+              "w-3 h-3 transition-colors",
+              i < Math.min(reputation, 5) 
+                ? "text-amber-500 fill-amber-400" 
+                : "text-muted-foreground/30"
+            )}
+          />
+        ))}
+      </div>
     </div>
-    <HelpCircle className="w-4 h-4 text-muted-foreground/50 cursor-pointer hover:text-primary" />
+    <span className="text-xs font-medium text-foreground">{reputation}</span>
   </div>
 );
 
@@ -36,67 +47,94 @@ export function CommunityCard({ member }: CommunityCardProps) {
   const displayedSkills = member.skills?.slice(0, 2) || [];
   const remainingSkills = member.skills ? member.skills.length - displayedSkills.length : 0;
 
-  
-
   return (
-    <Link href={`/profile/${member.id}`} className="block group">
-      <Card className="w-full max-w-sm rounded-2xl shadow-lg transition-all duration-300 group-hover:shadow-primary/20 bg-card border border-border/50 overflow-visible">
-        <div className="relative">
-          <div className="h-32 rounded-t-2xl overflow-hidden">
-            {member.banner_url ? (
-              <img
-                src={member.banner_url}
-                alt={`${member.username} banner`}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-tr from-green-500 via-teal-600 to-green-800" />
+    <Card className="w-full max-w-sm h-full flex flex-col rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-card border border-border overflow-hidden group">
+      {/* Fixed 16:9 banner area */}
+      <div className="relative w-full aspect-[16/9] overflow-hidden bg-gradient-to-tr from-primary/20 via-primary/10 to-primary/5">
+        {member.banner_url ? (
+          <Image
+            src={member.banner_url}
+            alt={`${member.username} banner`}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-tr from-primary/20 via-primary/10 to-primary/5" />
+        )}
+      </div>
+
+      {/* Avatar section - properly contained within card */}
+      <div className="flex justify-center -mt-8 px-4 relative z-10">
+        <Avatar className="w-16 h-16 border-4 border-background shadow-lg ring-2 ring-background/50">
+          <AvatarImage 
+            src={member.avatar_url || ""} 
+            alt={member.username || ""}
+            className="object-cover"
+          />
+          <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+            {member.username ? member.username.slice(0, 2).toUpperCase() : <User className="w-6 h-6" />}
+          </AvatarFallback>
+        </Avatar>
+      </div>
+
+      <CardContent className="flex flex-col flex-1 p-4 pt-4 space-y-3">
+        {/* Header with name and achievements - centered layout */}
+        <div className="text-center space-y-2">
+          <h3 className="font-semibold text-lg text-foreground line-clamp-1">
+            {member.username || 'Anonymous'}
+          </h3>
+          {member.achievements && member.achievements.length > 0 && (
+            <div className="flex items-center justify-center gap-1">
+              {member.achievements.slice(0, 3).map((ach, index) => (
+                <AchievementIcon key={`${ach}-${index}`} achievement={ach} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Role badge */}
+        {member.role && (
+          <Badge variant="outline" className="w-fit text-xs">
+            {member.role}
+          </Badge>
+        )}
+
+        {/* Skills section */}
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Skills</p>
+          <div className="flex flex-wrap gap-1">
+            {displayedSkills.map((skill, index) => (
+              <Badge key={`${skill}-${index}`} variant="secondary" className="text-xs">
+                {skill}
+              </Badge>
+            ))}
+            {remainingSkills > 0 && (
+              <Badge variant="outline" className="text-xs text-primary">
+                +{remainingSkills}
+              </Badge>
             )}
           </div>
-          
-          <Avatar className="absolute top-20 left-4 w-20 h-20 border-4 border-card shadow-xl z-10">
-            <AvatarImage src={member.avatar_url || ""} alt={member.username || ""} />
-            <AvatarFallback className="bg-gradient-to-br from-green-600 to-teal-700 text-white font-bold">
-              {member.username?.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
         </div>
 
-        <div className="p-4 pt-12 bg-card/80 backdrop-blur-sm rounded-b-2xl">
-          <div className="flex justify-between items-start">
-            <h3 className="font-bold text-xl text-foreground line-clamp-1">
-              {member.username}
-            </h3>
-            <div className="flex items-center gap-2 mt-1">
-              {member.achievements?.slice(0, 2).map((ach) => (
-                <AchievementIcon key={ach} achievement={ach} />
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-2">
-            <p className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Skills</p>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              {displayedSkills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="text-xs font-medium bg-muted-foreground/10 hover:bg-muted-foreground/20 text-muted-foreground">
-                  {skill}
-                </Badge>
-              ))}
-              {remainingSkills > 0 && (
-                <span className="text-xs font-bold text-orange-500 hover:underline cursor-pointer">
-                  +{remainingSkills} MORE SKILLS
-                </span>
-              )}
-            </div>
-          </div>
-
-          <p className="text-sm text-muted-foreground mt-4 line-clamp-3 leading-relaxed h-[60px]">
+        {/* Bio - clamped to 2-3 lines with fixed height */}
+        <div className="flex-1">
+          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed min-h-[2.5rem]">
             {member.bio || 'No bio available.'}
           </p>
-
-          <ReputationBar reputation={member.reputation || 0} />
         </div>
-      </Card>
-    </Link>
+
+        {/* Reputation and CTA aligned to bottom */}
+        <div className="space-y-3 pt-2">
+          <ReputationBar reputation={member.reputation || 0} />
+          
+          <Link href={`/profile/${member.id}`} className="block">
+            <Button variant="outline" size="sm" className="w-full">
+              View Profile
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
