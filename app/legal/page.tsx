@@ -1,6 +1,6 @@
 import { EcosystemContainer, type EcosystemItem } from "@/components/ecosystem/EcosystemContainer"
 import { Scale } from "lucide-react"
-import { getLegalServices } from "@/lib/database/ecosystem"
+import { getLegalServices } from "@/app/services/ecosystem"
 
 export default async function LegalPage() {
   // Fetch legal services data from database server-side

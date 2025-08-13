@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,10 +15,37 @@ interface BannerSectionProps {
 
 export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: BannerSectionProps) {
   const [isDragOver, setIsDragOver] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  // Cleanup preview URL when component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [])
+
+  // Cleanup old preview URL when bannerUrl changes (e.g., after successful save)
+  useEffect(() => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+  }, [bannerUrl])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && file.type.startsWith('image/')) {
+      // Cleanup previous preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+
+      // Create new preview URL for immediate display
+      const newPreviewUrl = URL.createObjectURL(file)
+      setPreviewUrl(newPreviewUrl)
+
       onBannerChange(file)
     }
   }
@@ -29,6 +56,15 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
     
     const file = event.dataTransfer.files?.[0]
     if (file && file.type.startsWith('image/')) {
+      // Cleanup previous preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+
+      // Create new preview URL for immediate display
+      const newPreviewUrl = URL.createObjectURL(file)
+      setPreviewUrl(newPreviewUrl)
+
       onBannerChange(file)
     }
   }
@@ -44,6 +80,12 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
   }
 
   const handleRemoveBanner = () => {
+    // Cleanup preview URL when removing
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+
     onBannerChange(null)
   }
 
@@ -60,19 +102,19 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             style={{
-              backgroundImage: bannerUrl ? `url(${bannerUrl})` : undefined,
+              backgroundImage: (previewUrl || bannerUrl) ? `url(${previewUrl || bannerUrl})` : undefined,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
             }}
           >
             {/* Overlay for better text visibility */}
-            {bannerUrl && (
+            {(previewUrl || bannerUrl) && (
               <div className="absolute inset-0 bg-black/20" />
             )}
             
             {/* Upload Area (only show when no banner or when dragging) */}
-            {(!bannerUrl || isDragOver) && isEditable && (
+            {(!(previewUrl || bannerUrl) || isDragOver) && isEditable && (
               <div className={`absolute inset-0 flex flex-col items-center justify-center text-white ${
                 isDragOver ? 'bg-black/50' : ''
               }`}>
@@ -89,7 +131,7 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
             {/* Action Buttons */}
             {isEditable && (
               <div className="absolute top-4 right-4 flex gap-2">
-                {bannerUrl && (
+                {(previewUrl || bannerUrl) && (
                   <Button
                     variant="secondary"
                     size="sm"
@@ -106,7 +148,7 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
                   onClick={() => document.getElementById('banner-upload')?.click()}
                 >
                   <Upload className="w-4 h-4 mr-1" />
-                  {bannerUrl ? 'Change' : 'Upload'}
+                  {(previewUrl || bannerUrl) ? 'Change' : 'Upload'}
                 </Button>
               </div>
             )}

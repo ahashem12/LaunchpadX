@@ -1,6 +1,6 @@
 import { EcosystemContainer, type EcosystemItem } from "@/components/ecosystem/EcosystemContainer"
 import { Rocket } from "lucide-react"
-import { getVentures } from "@/lib/database/ecosystem"
+import { getVentures } from "@/app/services/ecosystem"
 
 export default async function VentureStudiosPage() {
   // Fetch ventures data from database server-side

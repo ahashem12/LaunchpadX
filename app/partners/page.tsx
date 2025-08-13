@@ -1,6 +1,6 @@
 import { EcosystemContainer, type EcosystemItem } from "@/components/ecosystem/EcosystemContainer"
 import { Building2 } from "lucide-react"
-import { getPartners } from "@/lib/database/ecosystem"
+import { getPartners } from "@/app/services/ecosystem"
 
 export default async function PartnersPage() {
   // Fetch partners data from database server-side

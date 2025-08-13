@@ -1,6 +1,6 @@
 import { EcosystemContainer, type EcosystemItem } from "@/components/ecosystem/EcosystemContainer"
 import { DollarSign } from "lucide-react"
-import { getGrants } from "@/lib/database/ecosystem"
+import { getGrants } from "@/app/services/ecosystem"
 
 export default async function GrantsPage() {
   // Fetch grants data from database server-side

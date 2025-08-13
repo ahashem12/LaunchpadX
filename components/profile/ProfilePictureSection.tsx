@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import type React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -25,8 +25,26 @@ export function ProfilePictureSection({
   isEditable = true,
 }: ProfilePictureSectionProps) {
   const [isDragOver, setIsDragOver] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
+
+  // Cleanup preview URL when component unmounts or when avatarUrl changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [])
+
+  // Cleanup old preview URL when avatarUrl changes (e.g., after successful save)
+  useEffect(() => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+  }, [avatarUrl])
 
   const validateFile = (file: File): string | null => {
     const maxSize = 5 * 1024 * 1024 // 5MB
@@ -53,6 +71,15 @@ export function ProfilePictureSection({
       })
       return
     }
+
+    // Cleanup previous preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
+    // Create new preview URL for immediate display
+    const newPreviewUrl = URL.createObjectURL(file)
+    setPreviewUrl(newPreviewUrl)
 
     onFileSelect(file)
     toast({
@@ -92,6 +119,12 @@ export function ProfilePictureSection({
   }
 
   const handleRemove = () => {
+    // Cleanup preview URL when removing
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+
     onRemove()
     toast({
       title: "Image removed",
@@ -99,7 +132,7 @@ export function ProfilePictureSection({
     })
   }
 
-  const showRemoveButton = hasImage && avatarUrl && avatarUrl !== "" && isEditable;
+  const showRemoveButton = hasImage && (previewUrl || (avatarUrl && avatarUrl !== "")) && isEditable;
 
   return (
     <div className="xl:col-span-1">
@@ -116,9 +149,9 @@ export function ProfilePictureSection({
             <div className="relative group">
               <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
                 <AvatarImage 
-                  src={avatarUrl || "/images/default-avatar.png"} 
+                  src={previewUrl || avatarUrl || "/images/default-avatar.png"} 
                   alt="Profile picture" 
-                  className={avatarUrl ? "object-cover" : "hidden"}
+                  className={(previewUrl || avatarUrl) ? "object-cover" : "hidden"}
                 />
                 <AvatarFallback className="bg-muted">
                   <User className="h-12 w-12 text-muted-foreground" />
