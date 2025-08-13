@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { WatermelonIcon } from "../icons/WatermelonIcon"
+import { PigeonIcon } from "../icons/PigeonIcon"
 
 export function ChangePasswordForm() {
   const router = useRouter()
@@ -56,7 +56,7 @@ export function ChangePasswordForm() {
   return (
     <div className="w-full max-w-md bg-[#1E1E1E] rounded-lg border border-[#2A2A2A] p-8">
       <div className="flex flex-col items-center mb-8">
-        <WatermelonIcon size={180} className="text-white rotate-[145deg]" />
+        <PigeonIcon size={180} className="text-white" />
         <h2 className="text-2xl font-bold text-white">LPX</h2>
       </div>
 
