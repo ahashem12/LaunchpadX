@@ -1,6 +1,6 @@
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { ProfileView } from "@/components/profile/ProfileView";
-import { getCurrentAuthenticatedUser, getProfileById } from "@/app/services/profile/profile-service.service";
+import { getCurrentAuthenticatedUser, getProfileById } from "@/app/services/profile/profile-service";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 
