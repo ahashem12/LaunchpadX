@@ -110,7 +110,7 @@ We’re actively looking for contributors! We also strongly recommend to play ar
    ```bash
    git checkout -b feature/my-feature
    ```
-4. Push your branch and open a PR
+4. Push your branch and open a PR (Please add screenshots to all PRs!)
 
 ### 📣 WhatsApp Group
 
