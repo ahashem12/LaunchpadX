@@ -142,4 +142,5 @@ See `LICENSE` file.
 - [Our MENA Builder Vision (Prezi)](https://brief-vole-470.notion.site/LPX-x-HUB71-Prezi-23fd7ae9018b8039b807d2892ebd7060)
 - [Launchpad X Memo](https://brief-vole-470.notion.site/Launchpad-X-Memo-1f0d7ae9018b80289333d3c924d0c2e8)
 
-
+## 📮 Open to partnerships & collaboration
+Open to partnerships with NGOs, studios, funds & experts. Contact us to learn more TG @ suzo3 or suheil.zoabi@sfljerusalem.org
