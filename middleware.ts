@@ -73,6 +73,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/partners") ||
     pathname.startsWith("/grants") ||
     pathname.startsWith("/ventures") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/open-roles") ||
     pathname.startsWith("/legal");
 
   // If the user is authenticated and tries to visit an auth page (like login),
