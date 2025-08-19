@@ -14,11 +14,11 @@ import {
 import { User, Settings, ChevronDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { ProfileService } from "@/app/services/profile/profile-service"
-import type { ProfileData } from "@/types/profile"
+import type { Profile } from "@/types/profile"
 import { LogoutButton } from "./LogoutButton"
 
 export function UserDropdown() {
-  const [profile, setProfile] = useState<ProfileData | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -44,7 +44,7 @@ export function UserDropdown() {
   }
 
   const getDisplayName = () => {
-    return profile?.username || profile?.email?.split("@")[0] || "User"
+    return profile?.firstName + " " + profile?.lastName || profile?.email?.split("@")[0] || "User"
   }
 
   if (loading) {
@@ -61,9 +61,9 @@ export function UserDropdown() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-auto px-2">
           <Avatar className="h-7 w-7">
-            {profile?.profile_picture ? (
+            {profile?.avatar_url ? (
               <AvatarImage 
-                src={profile.profile_picture} 
+                src={profile.avatar_url} 
                 alt="Profile" 
                 className="object-cover"
               />

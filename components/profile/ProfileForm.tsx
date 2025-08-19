@@ -23,7 +23,8 @@ export function ProfileForm() {
   const [error, setError] = useState<string | null>(null)
 
   // Form data state
-  const [username, setUsername] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [bio, setBio] = useState("")
   const [skills, setSkills] = useState<string[]>([])
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
@@ -51,7 +52,8 @@ export function ProfileForm() {
           setProfile(data)
           // Set initial state for form fields and for tracking changes
           const initial = {
-            username: data.username || "",
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
             bio: data.bio || "",
             skills: data.skills || [],
             wallet_address: data.wallet_address || null,
@@ -59,7 +61,8 @@ export function ProfileForm() {
             banner_url: data.banner_url || null,
           }
           setInitialState(initial)
-          setUsername(initial.username)
+          setFirstName(initial.firstName)
+          setLastName(initial.lastName)
           setBio(initial.bio)
           setSkills(initial.skills)
           setWalletAddress(initial.wallet_address)
@@ -76,7 +79,8 @@ export function ProfileForm() {
   }, [toast])
 
   const isDirty =
-    initialState?.username !== username ||
+    initialState?.firstName !== firstName ||
+    initialState?.lastName !== lastName ||
     initialState?.bio !== bio ||
     JSON.stringify(initialState?.skills) !== JSON.stringify(skills) ||
     initialState?.wallet_address !== walletAddress ||
@@ -88,7 +92,8 @@ export function ProfileForm() {
     setSaving(true)
 
     const updates: ProfileUpdateInput = {
-      username,
+      firstName,
+      lastName,
       bio,
       skills,
       wallet_address: walletAddress,
@@ -114,7 +119,8 @@ export function ProfileForm() {
   }
 
   const handleDiscard = () => {
-    setUsername(initialState.username || "")
+    setFirstName(initialState.firstName || "")
+    setLastName(initialState.lastName || "")
     setBio(initialState.bio || "")
     setSkills(initialState.skills || [])
     setWalletAddress(initialState.wallet_address || null)
@@ -148,9 +154,11 @@ export function ProfileForm() {
 
         <div className="xl:col-span-2 space-y-6">
           <PersonalInfoSection
-            username={username}
+            firstName={firstName}
+            lastName={lastName}
             email={profile.email || ""}
-            onUsernameChange={setUsername}
+            onFirstNameChange={setFirstName}
+            onLastNameChange={setLastName}
           />
           <BioSection bio={bio} onBioChange={setBio} isEditable={true} />
           <SkillsSection skills={skills} onChange={setSkills} />
