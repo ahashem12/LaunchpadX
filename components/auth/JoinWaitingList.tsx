@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Logo } from "@/components/ui/logo"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { CheckCircle2 } from "lucide-react"
 
 
 export function JoinWaitingList() {
@@ -61,7 +62,7 @@ export function JoinWaitingList() {
       email: formData.email,
       password: formData.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/login?signup=success`,
       },
     })
 
@@ -123,7 +124,6 @@ export function JoinWaitingList() {
       }
 
       setIsSubmitted(true)
-      setTimeout(() => router.push("/login"), 15000)
     }
   }
 
@@ -131,12 +131,22 @@ export function JoinWaitingList() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardHeader className="items-center text-center">
-            <Logo />
-            <CardTitle className="text-2xl">Thank You!</CardTitle>
-            <CardDescription>
-              Please check your email to confirm your account. You will be notified once an admin has approved your request.
-            </CardDescription>
+          <CardHeader className="items-center text-center space-y-6">
+            <div className="rounded-full bg-green-100 p-3">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl">Thank You!</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Please check your email to confirm your account. You'll be notified once an admin has approved your request.
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="w-full mt-4"
+            >
+              Go to Login
+            </Button>
           </CardHeader>
         </Card>
       </div>
