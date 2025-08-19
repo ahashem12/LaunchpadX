@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Logo } from "@/components/ui/logo"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { CheckCircle2 } from "lucide-react"
 
 
 export function JoinWaitingList() {
@@ -25,7 +26,11 @@ export function JoinWaitingList() {
     fieldOfExpertise: "",
     joiningReason: "",       // single choice
   })
-  const [errors, setErrors] = useState({ phoneNumber: "", password: "" })
+  const [errors, setErrors] = useState<{
+    phoneNumber?: string;
+    password?: string;
+    [key: string]: string | undefined;
+  }>({})
   const supabase = createClient()
   const router = useRouter()
 
@@ -42,88 +47,154 @@ export function JoinWaitingList() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    if (formData.password !== formData.confirmPassword) {
-      setErrors({ ...errors, password: "Passwords do not match." })
-      setIsLoading(false)
-      return
-    }
-
-    const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
-    if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
-      setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
-      setIsLoading(false)
-      return
-    }
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-
-    if (signUpError) {
-      setIsLoading(false)
-      let description = "Something went wrong. Please try again."
-      if (signUpError.message.includes("User already registered")) {
-        description = "A user with this email already exists. Please try logging in."
-      } else if (signUpError.message.includes("Password should be at least 6 characters")) {
-        description = "Your password is too weak. Please use at least 6 characters."
-      } else if (signUpError.code === "email_address_invalid") {
-        description = "The email address you entered is invalid. Please provide a valid email."
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+    
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        setErrors({ ...errors, password: "Passwords do not match." })
+        setIsLoading(false)
+        return
       }
-      toast({
-        title: "Sign-up Error",
-        description,
-        variant: "destructive",
-      })
-      return
-    }
 
-    const { error: insertError } = await supabase
-      .from("profiles")
-      .insert({
+      const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
+      if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
+        setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
+        setIsLoading(false)
+        return
+      }
+      // Sign up the user and get the response
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phoneNumber,
+          },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (signUpError) {
+        setIsLoading(false);
+        let description = "Something went wrong. Please try again.";
+        if (signUpError.message.includes("User already registered")) {
+          description = "A user with this email already exists. Please try logging in.";
+        } else if (signUpError.message.includes("Password should be at least 6 characters")) {
+          description = "Your password is too weak. Please use at least 6 characters.";
+        } else if (signUpError.code === "email_address_invalid") {
+          description = "The email address you entered is invalid. Please provide a valid email.";
+        }
+        toast({
+          title: "Sign-up Error",
+          description,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!user) {
+        throw new Error('Failed to get user from signup response');
+      }
+
+      // Check if a profile with this email already exists
+      // const { data: existingProfile, error: fetchError } = await supabase
+      //   .from('profiles')
+      //   .select('id')
+      //   .eq('email', formData.email)
+      //   .single();
+
+      // let profileError: Error | null = null;
+      
+      const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
         phone: formData.phoneNumber,
         city: formData.city,
         fieldOfExpertise: formData.fieldOfExpertise,
         joiningReason: formData.joiningReason,
+        updated_at: new Date().toISOString(),
       })
+      .select();
+      
+      // If profile exists, update it; otherwise, insert a new one
+      // if (existingProfile) {
+      //   const { error: updateError } = await supabase
+      //     .from('profiles')
+      //     .update({
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     })
+      //     .eq('id', existingProfile.id);
 
-    setIsLoading(false)
+      //   profileError = updateError;
+      // } else {
+      //   // Only insert if profile doesn't exist
+      //   const { error: insertError } = await supabase
+      //     .from("profiles")
+      //     .insert({
+      //       id: user.id,
+      //       email: formData.email,
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     });
 
-    if (insertError) {
-      console.error("Error inserting into waiting list:", insertError)
-      let description = "Could not save your information. Please try again."
-      if (insertError.code === "23505") {
-        description = "This email address has already been added to the waiting list."
-      } else if (insertError.code === "42501") {
-        description = "You do not have permission to perform this action."
+      //   profileError = insertError;
+      // }
+
+      if (profileError) {
+        throw profileError;
       }
-      toast({
-        title: "Database Error",
-        description,
-        variant: "destructive",
-      })
-    } else {
-      const { error: signOutError } = await supabase.auth.signOut()
+
+      setIsLoading(false);
+
+      // Success case - sign out the user after successful signup
+      const { error: signOutError } = await supabase.auth.signOut();
 
       if (signOutError) {
-        console.error("Error signing out:", signOutError)
-        toast({
-          title: "Logout Error",
-          description: "Could not log you out after signing up. Please try logging out manually.",
-          variant: "destructive",
-        })
+        console.error("Error signing out:", signOutError);
+      } else {
+        // Clear form data
+        const form = e.target as HTMLFormElement;
+        form.reset();
       }
 
-      setIsSubmitted(true)
-      setTimeout(() => router.push("/login"), 15000)
+      setIsSubmitted(true);
+    } catch (error: any) {
+      console.error("Error in signup process:", error);
+      let description = "An unexpected error occurred. Please try again.";
+      
+      if (error.code === "23505") {
+        description = "This email address is already in use. Please try logging in instead.";
+      } else if (error.code === "42501") {
+        description = "You don't have permission to perform this action.";
+      } else if (error.message) {
+        description = error.message;
+      }
+      
+      toast({
+        title: "Error",
+        description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -131,12 +202,22 @@ export function JoinWaitingList() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardHeader className="items-center text-center">
-            <Logo />
-            <CardTitle className="text-2xl">Thank You!</CardTitle>
-            <CardDescription>
-              Please check your email to confirm your account. You will be notified once an admin has approved your request.
-            </CardDescription>
+          <CardHeader className="items-center text-center space-y-6">
+            <div className="rounded-full bg-green-100 p-3">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl">Thank You!</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Please check your email to confirm your account. You'll be notified once an admin has approved your request.
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="w-full mt-4"
+            >
+              Go to Login
+            </Button>
           </CardHeader>
         </Card>
       </div>
