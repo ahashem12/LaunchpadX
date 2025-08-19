@@ -1,7 +1,6 @@
 export interface Profile {
   id: string;
   email: string | null;
-  username: string | null;
   firstName: string | null;
   lastName: string | null;
   avatar_url: string | null;
@@ -9,16 +8,22 @@ export interface Profile {
   bio: string | null;
   role: string | null;
   skills: string[];
+  fieldOfExpertise: string | null;
   is_active: boolean;
   wallet_address: string | null;
   reputation: number;
   achievements: string[];
+  discordUrl: string | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
+  twitterUrl: string | null;
+  telegramUrl: string | null;
+  websiteUrl: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface ProfileUpdateInput {
-  username?: string;
   firstName?: string;
   lastName?: string;
   skills?: string[];
@@ -26,5 +31,11 @@ export interface ProfileUpdateInput {
   banner_url?: string;
   bio?: string;
   wallet_address?: string | null;
-  profile_picture?: string;
+  fieldOfExpertise?: string | null;
+  discordUrl?: string | null;
+  githubUrl?: string | null;
+  linkedinUrl?: string | null;
+  twitterUrl?: string | null;
+  telegramUrl?: string | null;
+  websiteUrl?: string | null;
 }

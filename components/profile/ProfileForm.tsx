@@ -10,6 +10,7 @@ import { ProfilePictureSection } from "./ProfilePictureSection"
 import { PersonalInfoSection } from "./PersonalInfoSection"
 import { BioSection } from "./BioSection"
 import { SkillsSection } from "./SkillsSection"
+import { SocialMediaSection } from "./SocialMediaSection"
 import { ReputationSection } from "./ReputationSection"
 import { AchievementsSection } from "./AchievementsSection"
 import { WalletAddressSection } from "./WalletAddressSection"
@@ -23,10 +24,19 @@ export function ProfileForm() {
   const [error, setError] = useState<string | null>(null)
 
   // Form data state
-  const [username, setUsername] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [bio, setBio] = useState("")
   const [skills, setSkills] = useState<string[]>([])
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
+  
+  // Social media state
+  const [discordUrl, setDiscordUrl] = useState("")
+  const [githubUrl, setGithubUrl] = useState("")
+  const [linkedinUrl, setLinkedinUrl] = useState("")
+  const [twitterUrl, setTwitterUrl] = useState("")
+  const [telegramUrl, setTelegramUrl] = useState("")
+  const [websiteUrl, setWebsiteUrl] = useState("")
 
   // Track original state for changes
   const [initialState, setInitialState] = useState<Partial<Profile>>({})
@@ -51,18 +61,32 @@ export function ProfileForm() {
           setProfile(data)
           // Set initial state for form fields and for tracking changes
           const initial = {
-            username: data.username || "",
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
             bio: data.bio || "",
             skills: data.skills || [],
             wallet_address: data.wallet_address || null,
             avatar_url: data.avatar_url || null,
             banner_url: data.banner_url || null,
+            discordUrl: data.discordUrl || "",
+            githubUrl: data.githubUrl || "",
+            linkedinUrl: data.linkedinUrl || "",
+            twitterUrl: data.twitterUrl || "",
+            telegramUrl: data.telegramUrl || "",
+            websiteUrl: data.websiteUrl || "",
           }
           setInitialState(initial)
-          setUsername(initial.username)
+          setFirstName(initial.firstName)
+          setLastName(initial.lastName)
           setBio(initial.bio)
           setSkills(initial.skills)
           setWalletAddress(initial.wallet_address)
+          setDiscordUrl(initial.discordUrl)
+          setGithubUrl(initial.githubUrl)
+          setLinkedinUrl(initial.linkedinUrl)
+          setTwitterUrl(initial.twitterUrl)
+          setTelegramUrl(initial.telegramUrl)
+          setWebsiteUrl(initial.websiteUrl)
         }
       } catch (err: any) {
         setError(err.message)
@@ -76,10 +100,17 @@ export function ProfileForm() {
   }, [toast])
 
   const isDirty =
-    initialState?.username !== username ||
+    initialState?.firstName !== firstName ||
+    initialState?.lastName !== lastName ||
     initialState?.bio !== bio ||
     JSON.stringify(initialState?.skills) !== JSON.stringify(skills) ||
     initialState?.wallet_address !== walletAddress ||
+    initialState?.discordUrl !== discordUrl ||
+    initialState?.githubUrl !== githubUrl ||
+    initialState?.linkedinUrl !== linkedinUrl ||
+    initialState?.twitterUrl !== twitterUrl ||
+    initialState?.telegramUrl !== telegramUrl ||
+    initialState?.websiteUrl !== websiteUrl ||
     newProfilePictureFile !== null ||
     newBannerFile !== null
 
@@ -88,10 +119,17 @@ export function ProfileForm() {
     setSaving(true)
 
     const updates: ProfileUpdateInput = {
-      username,
+      firstName,
+      lastName,
       bio,
       skills,
       wallet_address: walletAddress,
+      discordUrl: discordUrl || null,
+      githubUrl: githubUrl || null,
+      linkedinUrl: linkedinUrl || null,
+      twitterUrl: twitterUrl || null,
+      telegramUrl: telegramUrl || null,
+      websiteUrl: websiteUrl || null,
     }
 
     const { data, error } = await ProfileService.updateProfileWithPictureAndBanner(
@@ -114,10 +152,17 @@ export function ProfileForm() {
   }
 
   const handleDiscard = () => {
-    setUsername(initialState.username || "")
+    setFirstName(initialState.firstName || "")
+    setLastName(initialState.lastName || "")
     setBio(initialState.bio || "")
     setSkills(initialState.skills || [])
     setWalletAddress(initialState.wallet_address || null)
+    setDiscordUrl(initialState.discordUrl || "")
+    setGithubUrl(initialState.githubUrl || "")
+    setLinkedinUrl(initialState.linkedinUrl || "")
+    setTwitterUrl(initialState.twitterUrl || "")
+    setTelegramUrl(initialState.telegramUrl || "")
+    setWebsiteUrl(initialState.websiteUrl || "")
     setNewProfilePictureFile(null)
     setNewBannerFile(null)
     toast({ title: "Changes discarded" })
@@ -148,12 +193,29 @@ export function ProfileForm() {
 
         <div className="xl:col-span-2 space-y-6">
           <PersonalInfoSection
-            username={username}
+            firstName={firstName}
+            lastName={lastName}
             email={profile.email || ""}
-            onUsernameChange={setUsername}
+            onFirstNameChange={setFirstName}
+            onLastNameChange={setLastName}
           />
           <BioSection bio={bio} onBioChange={setBio} isEditable={true} />
           <SkillsSection skills={skills} onChange={setSkills} />
+          <SocialMediaSection
+            discordUrl={discordUrl}
+            githubUrl={githubUrl}
+            linkedinUrl={linkedinUrl}
+            twitterUrl={twitterUrl}
+            telegramUrl={telegramUrl}
+            websiteUrl={websiteUrl}
+            onDiscordChange={setDiscordUrl}
+            onGithubChange={setGithubUrl}
+            onLinkedinChange={setLinkedinUrl}
+            onTwitterChange={setTwitterUrl}
+            onTelegramChange={setTelegramUrl}
+            onWebsiteChange={setWebsiteUrl}
+            isEditable={true}
+          />
         </div>
 
         <div className="xl:col-span-1 space-y-6">
