@@ -8,10 +8,17 @@ export interface Profile {
   bio: string | null;
   role: string | null;
   skills: string[];
+  fieldOfExpertise: string | null;
   is_active: boolean;
   wallet_address: string | null;
   reputation: number;
   achievements: string[];
+  discordUrl: string | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
+  twitterUrl: string | null;
+  telegramUrl: string | null;
+  websiteUrl: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,4 +31,11 @@ export interface ProfileUpdateInput {
   banner_url?: string;
   bio?: string;
   wallet_address?: string | null;
+  fieldOfExpertise?: string | null;
+  discordUrl?: string | null;
+  githubUrl?: string | null;
+  linkedinUrl?: string | null;
+  twitterUrl?: string | null;
+  telegramUrl?: string | null;
+  websiteUrl?: string | null;
 }
