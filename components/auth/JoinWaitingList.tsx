@@ -15,8 +15,8 @@ export function JoinWaitingList() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
-    familyName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phoneNumber: "",
     password: "",
@@ -84,10 +84,10 @@ export function JoinWaitingList() {
     }
 
     const { error: insertError } = await supabase
-      .from("waiting_list")
+      .from("profiles")
       .insert({
-        name: formData.name,
-        familyName: formData.familyName,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phoneNumber,
         city: formData.city,
@@ -157,13 +157,13 @@ export function JoinWaitingList() {
             <div className="grid md:grid-cols-2 md:gap-6">
               {/* Name */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
-                  placeholder="Your Name"
+                  placeholder="Your First Name"
                   required
                   disabled={isLoading}
                 />
@@ -171,11 +171,11 @@ export function JoinWaitingList() {
 
               {/* Family Name */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="familyName">Family Name</Label>
+                <Label htmlFor="lastName">Last Name</Label>
                 <Input
-                  id="familyName"
-                  name="familyName"
-                  value={formData.familyName}
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleInputChange}
                   placeholder="Your Family Name"
                   required

@@ -359,6 +359,8 @@ export async function getProfileById(profileId: string) {
       achievements: Array.isArray(data.achievements) ? data.achievements : [],
       created_at: data.created_at,
       updated_at: data.updated_at,
+      firstName: data.firstName || null,
+      lastName: data.lastName || null
     };
     
     return { profile, error: null };

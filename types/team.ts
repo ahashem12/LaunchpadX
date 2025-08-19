@@ -4,6 +4,8 @@ export interface TeamMember {
   user_id: string;
   project_id: string;
   username: string;
+  firstName: string | null;
+  lastName: string | null;
   email: string;
   profile_picture?: string | null;
   role: string;
