@@ -22,7 +22,7 @@ export function JoinWaitingList() {
     password: "",
     confirmPassword: "",
     city: "",
-    expertise: "",
+    fieldOfExpertise: "",
     joiningReason: "",       // single choice
   })
   const [errors, setErrors] = useState({ phoneNumber: "", password: "" })
@@ -91,7 +91,7 @@ export function JoinWaitingList() {
         email: formData.email,
         phone: formData.phoneNumber,
         city: formData.city,
-        expertise: formData.expertise,
+        fieldOfExpertise: formData.fieldOfExpertise,
         joiningReason: formData.joiningReason,
       })
 
@@ -269,18 +269,18 @@ export function JoinWaitingList() {
 
               {/* Field Of Expertise */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="expertise">Field Of Expertise</Label>
+                <Label htmlFor="fieldOfExpertise">Field Of Expertise</Label>
                 <select
-                  id="expertise"
-                  name="expertise"
-                  value={formData.expertise}
+                  id="fieldOfExpertise"
+                  name="fieldOfExpertise"
+                  value={formData.fieldOfExpertise}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
                   className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary !text-black"
                   style={{ color: "#000" }}
                 >
-                  <option value="" className="text-black">Select your expertise</option>
+                  <option value="" className="text-black">Select Your Expertise</option>
                   <option value="Tech" className="text-black">Tech</option>
                   <option value="Business" className="text-black">Business</option>
                   <option value="Content building" className="text-black">Content building</option>
