@@ -25,7 +25,7 @@ export function JoinWaitingList() {
     expertise: "",
     joiningReason: "",       // single choice
   })
-  const [errors, setErrors] = useState({ phoneNumber: "", password: "" })
+  const [errors, setErrors] = useState({ phoneNumber: "", password: "" , name: "", familyName: "" })
   const supabase = createClient()
   const router = useRouter()
 
@@ -37,6 +37,12 @@ export function JoinWaitingList() {
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
     }
+    if (name === "name" && errors.name) {
+      setErrors({ ...errors, name: "" })
+    }
+    if (name === "familyName" && errors.familyName) {
+      setErrors({ ...errors, familyName: "" })
+    }
     if (name === "confirmPassword" && errors.password) {
       setErrors({ ...errors, password: "" })
     }
@@ -44,27 +50,42 @@ export function JoinWaitingList() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+  
+    const name = formData.name.trim()
+    const familyName = formData.familyName.trim()
+  
+    const nameRegex = /^[A-Za-z\u0590-\u05FF\s'-]{3,}$/
+  
+    const phoneRegex = /^\+?[0-9\s-]{7,15}$/
+  
+    const nextErrors = { phoneNumber: "", password: "", name: "", familyName: "" }
+  
+    if (!nameRegex.test(name)) {
+      nextErrors.name = "Please enter a valid first name(letters only, min 3)."
+    }
+    if (!nameRegex.test(familyName)) {
+      nextErrors.familyName = "Please enter a valid family name(letters only, min 3)."
+    }
     if (formData.password !== formData.confirmPassword) {
-      setErrors({ ...errors, password: "Passwords do not match." })
-      setIsLoading(false)
-      return
+      nextErrors.password = "Passwords do not match."
     }
-
-    const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
     if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
-      setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
-      setIsLoading(false)
+      nextErrors.phoneNumber = "Please enter a valid phone number."
+    }
+  
+    if (nextErrors.name || nextErrors.familyName || nextErrors.password || nextErrors.phoneNumber) {
+      setErrors(nextErrors)
       return
     }
+  
+    setIsLoading(true)
+  
     const { error: signUpError } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     })
-
+  
     if (signUpError) {
       setIsLoading(false)
       let description = "Something went wrong. Please try again."
@@ -72,60 +93,48 @@ export function JoinWaitingList() {
         description = "A user with this email already exists. Please try logging in."
       } else if (signUpError.message.includes("Password should be at least 6 characters")) {
         description = "Your password is too weak. Please use at least 6 characters."
-      } else if (signUpError.code === "email_address_invalid") {
+      } else if ((signUpError as any).code === "email_address_invalid") {
         description = "The email address you entered is invalid. Please provide a valid email."
       }
-      toast({
-        title: "Sign-up Error",
-        description,
-        variant: "destructive",
-      })
+      toast({ title: "Sign-up Error", description, variant: "destructive" })
       return
     }
-
-    const { error: insertError } = await supabase
-      .from("waiting_list")
-      .insert({
-        name: formData.name,
-        familyName: formData.familyName,
-        email: formData.email,
-        phone: formData.phoneNumber,
-        city: formData.city,
-        expertise: formData.expertise,
-        joiningReason: formData.joiningReason,
-      })
-
+  
+    const { error: insertError } = await supabase.from("waiting_list").insert({
+      name,
+      familyName,
+      email: formData.email,
+      phone: formData.phoneNumber,
+      city: formData.city,
+      expertise: formData.expertise,
+      joiningReason: formData.joiningReason,
+    })
+  
     setIsLoading(false)
-
+  
     if (insertError) {
       console.error("Error inserting into waiting list:", insertError)
       let description = "Could not save your information. Please try again."
-      if (insertError.code === "23505") {
-        description = "This email address has already been added to the waiting list."
-      } else if (insertError.code === "42501") {
-        description = "You do not have permission to perform this action."
-      }
+      if (insertError.code === "23505") description = "This email address has already been added to the waiting list."
+      else if (insertError.code === "42501") description = "You do not have permission to perform this action."
+      toast({ title: "Database Error", description, variant: "destructive" })
+      return
+    }
+  
+    const { error: signOutError } = await supabase.auth.signOut()
+    if (signOutError) {
+      console.error("Error signing out:", signOutError)
       toast({
-        title: "Database Error",
-        description,
+        title: "Logout Error",
+        description: "Could not log you out after signing up. Please try logging out manually.",
         variant: "destructive",
       })
-    } else {
-      const { error: signOutError } = await supabase.auth.signOut()
-
-      if (signOutError) {
-        console.error("Error signing out:", signOutError)
-        toast({
-          title: "Logout Error",
-          description: "Could not log you out after signing up. Please try logging out manually.",
-          variant: "destructive",
-        })
-      }
-
-      setIsSubmitted(true)
-      setTimeout(() => router.push("/login"), 5000)
     }
+  
+    setIsSubmitted(true)
+    setTimeout(() => router.push("/login"), 5000)
   }
+  
 
   if (isSubmitted) {
     return (
@@ -167,6 +176,9 @@ export function JoinWaitingList() {
                   required
                   disabled={isLoading}
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-500 pt-1">{errors.name}</p>
+                )}
               </div>
 
               {/* Family Name */}
@@ -181,6 +193,9 @@ export function JoinWaitingList() {
                   required
                   disabled={isLoading}
                 />
+                {errors.familyName && (
+                  <p className="text-sm text-red-500 pt-1">{errors.familyName}</p>
+                )}
               </div>
             </div>
 
