@@ -123,7 +123,7 @@ export function JoinWaitingList() {
       }
 
       setIsSubmitted(true)
-      setTimeout(() => router.push("/login"), 5000)
+      setTimeout(() => router.push("/login"), 15000)
     }
   }
 
