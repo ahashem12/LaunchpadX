@@ -37,7 +37,8 @@ export function ProfileView({ profile }: ProfileViewProps) {
 
           <div className="xl:col-span-2 space-y-6">
             <PersonalInfoSection
-              username={profile.username || ""}
+              firstName={profile.firstName || ""}
+              lastName={profile.lastName || ""}
               email={profile.email || ""}
               isEditable={false}
             />

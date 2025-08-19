@@ -133,7 +133,6 @@ export async function getCommunityMembers(): Promise<Profile[]> {
       profiles = data.map(profile => ({
         id: profile.id,
         email: profile.email || null,
-        username: profile.username || null,
         firstName: profile.firstName || null,
         lastName: profile.lastName || null,
         avatar_url: profile.avatar_url || null,
@@ -168,7 +167,8 @@ async function getCommunityMembersEssential(supabase: any): Promise<Profile[]> {
       .select(`
         id,
         email,
-        username,
+        firstName,
+        lastName,
         avatar_url,
         banner_url,
         bio,
