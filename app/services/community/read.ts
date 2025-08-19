@@ -134,6 +134,8 @@ export async function getCommunityMembers(): Promise<Profile[]> {
         id: profile.id,
         email: profile.email || null,
         username: profile.username || null,
+        firstName: profile.firstName || null,
+        lastName: profile.lastName || null,
         avatar_url: profile.avatar_url || null,
         banner_url: profile.banner_url || null,
         bio: profile.bio || null,

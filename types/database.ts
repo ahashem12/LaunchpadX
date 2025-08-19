@@ -10,6 +10,8 @@ export interface Database {
       profiles: {
         Row: {
           username: string
+          firstName: string | null
+          lastName: string | null
           profile_picture: string
           skills: never[]
           id: string
