@@ -73,6 +73,7 @@ export function JoinWaitingList() {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
+            phone: formData.phoneNumber,
           },
           emailRedirectTo: `${window.location.origin}/`,
         },
@@ -101,46 +102,61 @@ export function JoinWaitingList() {
       }
 
       // Check if a profile with this email already exists
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', formData.email)
-        .single();
+      // const { data: existingProfile, error: fetchError } = await supabase
+      //   .from('profiles')
+      //   .select('id')
+      //   .eq('email', formData.email)
+      //   .single();
 
-      let profileError: Error | null = null;
+      // let profileError: Error | null = null;
+      
+      const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phoneNumber,
+        city: formData.city,
+        fieldOfExpertise: formData.fieldOfExpertise,
+        joiningReason: formData.joiningReason,
+        updated_at: new Date().toISOString(),
+      })
+      .select();
       
       // If profile exists, update it; otherwise, insert a new one
-      if (existingProfile) {
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phoneNumber,
-            city: formData.city,
-            fieldOfExpertise: formData.fieldOfExpertise,
-            joiningReason: formData.joiningReason,
-          })
-          .eq('id', existingProfile.id);
+      // if (existingProfile) {
+      //   const { error: updateError } = await supabase
+      //     .from('profiles')
+      //     .update({
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     })
+      //     .eq('id', existingProfile.id);
 
-        profileError = updateError;
-      } else {
-        // Only insert if profile doesn't exist
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert({
-            id: user.id,
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phoneNumber,
-            city: formData.city,
-            fieldOfExpertise: formData.fieldOfExpertise,
-            joiningReason: formData.joiningReason,
-          });
+      //   profileError = updateError;
+      // } else {
+      //   // Only insert if profile doesn't exist
+      //   const { error: insertError } = await supabase
+      //     .from("profiles")
+      //     .insert({
+      //       id: user.id,
+      //       email: formData.email,
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     });
 
-        profileError = insertError;
-      }
+      //   profileError = insertError;
+      // }
 
       if (profileError) {
         throw profileError;
