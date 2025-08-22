@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client"
-import type { Project, TeamRole } from "@/types"
+import type { Project, Role, RoleType,RoleCategory, TeamRole } from "@/types"
 import { validateProjectId } from "./utils"
 
 export async function getProject(projectId: string): Promise<Project | null> {
@@ -125,5 +125,63 @@ export async function getAllOpenRoles(): Promise<TeamRole[]> {
   } catch (error) {
     console.error("Unexpected error getting all open roles:", error)
     return []
+  }
+}
+export async function getRole(roleId: string): Promise<Role | null> {
+  try {
+    // if (!validateProjectId(projectId)) {
+    //   console.error("Invalid UUID format:", projectId)
+    //   return null
+    // }
+
+    const supabase = createClient()
+    const { data, error } = await supabase.from("roles").select().eq("id", roleId).single()
+    if (error) {
+      return null
+    }
+
+    return data as Role
+  } catch (error) {
+    console.error("Unexpected error getting role:", error)
+    return null
+  }
+}
+export async function getRoleType(roleTypeId: string): Promise<RoleType | null> {
+  try {
+    // if (!validateProjectId(projectId)) {
+    //   console.error("Invalid UUID format:", projectId)
+    //   return null
+    // }
+
+    const supabase = createClient()
+    const { data, error } = await supabase.from("role_types").select().eq("id", roleTypeId).single()
+    if (error) {
+      return null
+    }
+
+    return data as RoleType
+  } catch (error) {
+    console.error("Unexpected error getting role type:", error)
+    return null
+  }
+}
+export async function getRoleCategory(roleCategoryID: string): Promise<RoleCategory | null> {
+  try {
+    // if (!validateProjectId(projectId)) {
+    //   console.error("Invalid UUID format:", projectId)
+    //   return null
+    // }
+    console.log("roleCategoryID",roleCategoryID)
+    const supabase = createClient()
+    const { data, error } = await supabase.from("role_categories").select().eq("id", roleCategoryID).single()
+    console.log(data)
+    if (error) {
+      return null
+    }
+
+    return data as RoleCategory
+  } catch (error) {
+    console.error("Unexpected error getting role type:", error)
+    return null
   }
 }

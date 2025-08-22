@@ -1,6 +1,9 @@
 // Re-export all types from organized modules
 export * from "./auth"
 export * from "./project"
+export * from "./role"
+export * from "./role-type"
+export * from "./role-category" 
 export * from "./profile"
 export * from "./team"
 export * from "./agreements"
