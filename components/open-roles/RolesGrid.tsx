@@ -23,7 +23,6 @@ export function RolesGrid({ roles, userProjectIds }: RolesGridProps) {
           const isMember = userProjectIds.has(role.id);
           // console.log(role.)
           const linkHref = isMember
-          //problem is here, we are returning the project page detail (the project service instead of the open role service)
             ? `/open-roles/${role.id}`
             : `/browse/open-roles/${role.id}`;
 

@@ -17,6 +17,22 @@ async function getAllSkills(): Promise<Skill[]> {
   return data
 }
 
+async function getSkillsByIds(ids: string[]): Promise<Skill[]> {
+  if (!ids || ids.length === 0) return [];
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("skills")
+    .select("id, name")
+    .in("id", ids);
+
+  if (error) {
+    console.error("Error fetching skills by IDs:", error);
+    return [];
+  }
+  return data;
+}
+
 export const skillService = {
   getAllSkills,
+  getSkillsByIds,
 }
