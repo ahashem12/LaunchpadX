@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import { OpenRolesHeader, OpenRolesFilters, RolesGrid } from "@/components/open-roles"
 import { projectService } from "@/app/services/projects/project-service"
 import type { TeamRole } from "@/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function OpenRolesPage() {
   const [roles, setRoles] = useState<TeamRole[]>([])
@@ -13,15 +14,24 @@ export default function OpenRolesPage() {
   const [category, setCategory] = useState("all")
   const [skill, setSkill] = useState("all")
   const [sortBy, setSortBy] = useState("newest")
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchRoles = async () => {
-      Promise.all([projectService.getAllOpenRoles(), projectService.getUserProjects()])
-        .then(([allRoles, userProjects]) => {
-          setRoles(allRoles)
-          setUserProjectIds(new Set(userProjects.map((p) => p.id)))
-        })
-        .catch((err) => console.error("Error fetching roles:", err))
+      setLoading(true)
+      try {
+        const [allRoles, userProjects] = await Promise.all([
+          projectService.getAllOpenRoles(),
+          projectService.getUserProjects(),
+        ])
+        setRoles(allRoles)
+        setUserProjectIds(new Set(userProjects.map((p) => p.id)))
+      } catch (err) {
+        console.error("Error fetching roles:", err)
+        setRoles([])
+      } finally {
+        setLoading(false)
+      }
     }
     fetchRoles()
   }, [])
@@ -89,7 +99,6 @@ export default function OpenRolesPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 pb-8">
         <OpenRolesHeader />
-
         <OpenRolesFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -104,8 +113,23 @@ export default function OpenRolesPage() {
           sortBy={sortBy}
           setSortBy={setSortBy}
         />
-
-        <RolesGrid roles={filteredRoles} userProjectIds={userProjectIds} />
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3,4,5,6,7,8].map((i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="h-32 w-full rounded-t-lg bg-muted/50" />
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-6 w-3/4 bg-muted/50" />
+                  <Skeleton className="h-4 w-full bg-muted/50" />
+                  <Skeleton className="h-4 w-full bg-muted/50" />
+                  <Skeleton className="h-8 w-20 bg-muted/50" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <RolesGrid roles={filteredRoles} userProjectIds={userProjectIds} />
+        )}
       </div>
     </div>
   )
