@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/client"
 import type { Project, Role, RoleType,RoleCategory, TeamRole } from "@/types"
-import { validateProjectId } from "./utils"
+import { validateId } from "./utils"
 
 export async function getProject(projectId: string): Promise<Project | null> {
   try {
-    if (!validateProjectId(projectId)) {
+    if (!validateId(projectId)) {
       console.error("Invalid UUID format:", projectId)
       return null
     }
@@ -72,7 +72,7 @@ export async function getAllProjects(): Promise<Project[]> {
 
 export async function getProjectRoles(projectId: string): Promise<TeamRole[]> {
   try {
-    if (!validateProjectId(projectId)) {
+    if (!validateId(projectId)) {
       console.error("Invalid UUID format for project ID:", projectId)
       return []
     }
@@ -129,10 +129,10 @@ export async function getAllOpenRoles(): Promise<TeamRole[]> {
 }
 export async function getRole(roleId: string): Promise<Role | null> {
   try {
-    // if (!validateProjectId(projectId)) {
-    //   console.error("Invalid UUID format:", projectId)
-    //   return null
-    // }
+    if (!validateId(roleId)) {
+      console.error("Invalid UUID format:", roleId)
+      return null
+    }
 
     const supabase = createClient()
     const { data, error } = await supabase.from("roles").select().eq("id", roleId).single()
@@ -148,10 +148,10 @@ export async function getRole(roleId: string): Promise<Role | null> {
 }
 export async function getRoleType(roleTypeId: string): Promise<RoleType | null> {
   try {
-    // if (!validateProjectId(projectId)) {
-    //   console.error("Invalid UUID format:", projectId)
-    //   return null
-    // }
+    if (!validateId(roleTypeId)) {
+      console.error("Invalid UUID format:", roleTypeId)
+      return null
+    }
 
     const supabase = createClient()
     const { data, error } = await supabase.from("role_types").select().eq("id", roleTypeId).single()
@@ -167,10 +167,10 @@ export async function getRoleType(roleTypeId: string): Promise<RoleType | null> 
 }
 export async function getRoleCategory(roleCategoryID: string): Promise<RoleCategory | null> {
   try {
-    // if (!validateProjectId(projectId)) {
-    //   console.error("Invalid UUID format:", projectId)
-    //   return null
-    // }
+    if (!validateId(roleCategoryID)) {
+      console.error("Invalid UUID format:", roleCategoryID)
+      return null
+    }
     console.log("roleCategoryID",roleCategoryID)
     const supabase = createClient()
     const { data, error } = await supabase.from("role_categories").select().eq("id", roleCategoryID).single()
