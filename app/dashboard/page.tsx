@@ -1,22 +1,31 @@
 "use client"
 
 import Link from "next/link"
-import { Plus, ArrowRight } from "lucide-react"
+import { Plus, ArrowRight, Shield } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { projectService } from "@/app/services/projects/project-service"
+import { adminService } from "@/app/services/admin"
+import { AdminDashboardSection } from "@/components/admin"
 import { useState, useEffect } from "react"
 import type { Project } from "@/types"
 
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [recentActivity, setRecentActivity] = useState<Array<{id: string, name: string, status: string, updatedAt: string}>>([])
   const [aiInsights, setAiInsights] = useState<Array<{id: string, message: string}>>([])
 
   useEffect(() => {
     loadDashboardData()
+    checkAdminStatus()
   }, [])
+
+  const checkAdminStatus = async () => {
+    const adminStatus = await adminService.isAdmin()
+    setIsAdmin(adminStatus)
+  }
 
   const loadDashboardData = async () => {
     setIsLoading(true)
@@ -102,9 +111,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6">      
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white">
+          {isAdmin ? (
+            <span className="flex items-center gap-2">
+              <Shield className="h-6 w-6 text-yellow-400" />
+              Admin Dashboard
+            </span>
+          ) : (
+            'Dashboard'
+          )}
+        </h1>
         <Link href="/projects/new">
           <Button className="bg-watermelon-green hover:bg-watermelon-green/90">
             <Plus className="h-4 w-4 mr-2" />
@@ -179,6 +197,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {isAdmin && <AdminDashboardSection />}
 
       <div>
         <div className="flex items-center justify-between mb-4">
