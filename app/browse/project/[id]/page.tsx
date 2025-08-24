@@ -24,7 +24,7 @@ export default async function BrowseProjectPage({ params }: BrowseProjectPagePro
         <ProjectHeader project={project} />
       </div>
       <ProjectDescription description={project.description} />
-      <ProjectNextSteps />
+      <ProjectNextSteps projectId={project.id} />
     </div>
   )
 }

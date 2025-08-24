@@ -34,8 +34,8 @@ export function OpenRolesFilters({
   setSortBy,
 }: OpenRolesFiltersProps) {
   return (
-    <div className="mb-8 p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50">
-      <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+    <div className="mb-8 p-6 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 max-w-full overflow-x-auto">
+      <div className="flex flex-col lg:flex-row flex-wrap gap-4 items-center justify-between w-full">
         <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
           <Select value={roleType} onValueChange={setRoleType}>
             <SelectTrigger className="w-full sm:w-[180px] bg-background/50">

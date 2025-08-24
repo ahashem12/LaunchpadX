@@ -19,12 +19,9 @@ export function RolesGrid({ roles, userProjectIds }: RolesGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {roles.map((role) => {
-        if (role.project?.id) {
-          const isMember = userProjectIds.has(role.project.id);
-          const linkHref = isMember
-            ? `/projects/${role.project.id}`
-            : `/browse/project/${role.project.id}`;
-
+        if (role.id) {
+          const isMember = userProjectIds.has(role.id);
+          const linkHref = `/open-roles/${role.id}`
           return (
             <Link href={linkHref}
               key={role.id}>
