@@ -56,7 +56,10 @@ export async function getUserProjects(): Promise<Project[]> {
 export async function getAllProjects(): Promise<Project[]> {
   try {
     const supabase = createClient()
-    const { data, error } = await supabase.from("projects").select("*")
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("is_active", true)
 
     if (error) {
       console.error("Error getting all projects:", error)
