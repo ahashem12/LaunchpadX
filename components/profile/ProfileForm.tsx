@@ -43,9 +43,11 @@ export function ProfileForm() {
 
   // Profile picture state
   const [newProfilePictureFile, setNewProfilePictureFile] = useState<File | null>(null)
+  const [profilePictureRemoved, setProfilePictureRemoved] = useState(false)
   
   // Banner state
   const [newBannerFile, setNewBannerFile] = useState<File | null>(null)
+  const [bannerRemoved, setBannerRemoved] = useState(false)
 
   const { toast } = useToast()
 
@@ -112,12 +114,13 @@ export function ProfileForm() {
     initialState?.telegramUrl !== telegramUrl ||
     initialState?.websiteUrl !== websiteUrl ||
     newProfilePictureFile !== null ||
-    newBannerFile !== null
+    newBannerFile !== null || 
+	profilePictureRemoved ||
+	bannerRemoved
 
   const handleSave = async () => {
     if (!isDirty) return
     setSaving(true)
-
     const updates: ProfileUpdateInput = {
       firstName,
       lastName,
@@ -130,6 +133,13 @@ export function ProfileForm() {
       twitterUrl: twitterUrl || null,
       telegramUrl: telegramUrl || null,
       websiteUrl: websiteUrl || null,
+    }
+	if (profilePictureRemoved) {
+		updates.avatar_url = null;
+	}
+
+	if (bannerRemoved) {
+      updates.banner_url = null;
     }
 
     const { data, error } = await ProfileService.updateProfileWithPictureAndBanner(
@@ -146,6 +156,8 @@ export function ProfileForm() {
       setInitialState(newInitialState);
       setNewProfilePictureFile(null)
       setNewBannerFile(null)
+	  setProfilePictureRemoved(false);
+	  setBannerRemoved(false);
       toast({ title: "Profile saved successfully!" })
     }
     setSaving(false)
@@ -165,8 +177,24 @@ export function ProfileForm() {
     setWebsiteUrl(initialState.websiteUrl || "")
     setNewProfilePictureFile(null)
     setNewBannerFile(null)
+	setProfilePictureRemoved(false);
+	setBannerRemoved(false);
     toast({ title: "Changes discarded" })
   }
+  const handleProfilePictureRemove = () => {
+    setNewProfilePictureFile(null);
+    setProfilePictureRemoved(true);
+  };
+
+  const handleBannerChange = (file: File | null) => {
+    if (file === null) {
+      setNewBannerFile(null);
+      setBannerRemoved(true);
+    } else {
+      setNewBannerFile(file);
+      setBannerRemoved(false);
+    }
+  };
 
   if (loading) return <ProfileLoading />
   if (error) return <div className="text-center text-destructive py-10">Error: {error}</div>
@@ -177,16 +205,19 @@ export function ProfileForm() {
       <ProfileHeader error={error} />
       
       <BannerSection
-        bannerUrl={profile.banner_url}
-        onBannerChange={setNewBannerFile}
+        bannerUrl={bannerRemoved ? null : profile.banner_url}
+        onBannerChange={handleBannerChange}
         isEditable={true}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         <ProfilePictureSection
-          avatarUrl={profile.avatar_url}
-          onFileSelect={setNewProfilePictureFile}
-          onRemove={() => { /* TODO: Implement remove logic if needed */ }}
+          avatarUrl={profilePictureRemoved ? null :profile.avatar_url}
+          onFileSelect={(file) => {
+			setNewProfilePictureFile(file)
+			setProfilePictureRemoved(false)
+		  }}
+          onRemove={handleProfilePictureRemove}
           hasImage={!!profile.avatar_url}
           isEditable={true}
         />

@@ -271,7 +271,10 @@ export class ProfileService {
         const { url, error: uploadError } = await this.uploadProfilePicture(profilePictureFile);
         if (uploadError) return { data: null, error: uploadError };
         avatarUrl = url ?? "";
-      }
+      }else if (updates.avatar_url === null) {
+		oldPictureUrl = currentProfile?.avatar_url || null;
+		avatarUrl = null;
+	  }
 
       // Handle banner upload
       if (bannerFile) {
@@ -279,7 +282,10 @@ export class ProfileService {
         const { url, error: uploadError } = await this.uploadBanner(bannerFile);
         if (uploadError) return { data: null, error: uploadError };
         bannerUrl = url ?? "";
-      }
+      }else if (updates.banner_url === null) {
+		oldBannerUrl = currentProfile?.banner_url || null;
+		bannerUrl = null;
+	  }
 
       const { data, error } = await this.supabase
         .from("profiles")
