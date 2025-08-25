@@ -174,7 +174,6 @@ export function JoinWaitingList() {
         const form = e.target as HTMLFormElement;
         form.reset();
       }
-
       setIsSubmitted(true);
     } catch (error: any) {
       console.error("Error in signup process:", error);
