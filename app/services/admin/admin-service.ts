@@ -83,7 +83,7 @@ export const adminService = {
 
       const { data: userData, error: userError } = await supabase
         .from("profiles")
-        .select("email, first_name")
+        .select("email, firstName")
         .eq("id", projectData.user_id)
         .single()
 
@@ -137,7 +137,7 @@ export const adminService = {
       // Get user details for email
       const { data: userData, error: userError } = await supabase
         .from("profiles")
-        .select("email, first_name")
+        .select("email, firstName")
         .eq("id", userId)
         .single()
 
