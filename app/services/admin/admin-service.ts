@@ -93,7 +93,7 @@ export const adminService = {
       }
 
       const projectEmailHtml = `
-        <p>Hello ${userData.first_name || ''},</p>
+        <p>Hello ${userData.firstName || ''},</p>
         <p>Congratulations — your project <strong>${projectData.name}</strong> has been accepted and is now live on LPX!<br>
         The community can now discover, contribute, and collaborate with you to bring your vision to life.</p>
         <p>Here’s what you can do next:</p>
@@ -147,7 +147,7 @@ export const adminService = {
       }
 
       const userEmailHtml = `
-        <p>Hello ${userData.first_name || ''},</p>
+        <p>Hello ${userData.firstName || ''},</p>
         <p>Welcome to LPX — the ecosystem designed to simplify how you build, contribute, and get funded.</p>
         <p>Your journey starts here:</p>
         <ul>
