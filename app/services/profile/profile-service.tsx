@@ -5,7 +5,7 @@ import type { Profile as ProfileType } from "@/types";
 
 export class ProfileService {
   private static supabase = createClient();
-  private static readonly PROFILE_PICTURE_BUCKET = "profile-pictures";
+  private static readonly AVATAR_URL_BUCKET = "profile-pictures";
   private static readonly BANNER_BUCKET = "profile-banners";
   private static readonly ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -73,7 +73,7 @@ export class ProfileService {
       const fileName = `user_${user.id}/profile_${Date.now()}.${fileExt}`;
 
       const { data: uploadData, error: uploadError } = await this.supabase.storage
-        .from(this.PROFILE_PICTURE_BUCKET)
+        .from(this.AVATAR_URL_BUCKET)
         .upload(fileName, file, {
           cacheControl: '3600',
           upsert: false,
@@ -81,7 +81,7 @@ export class ProfileService {
         });
 
       if (uploadError) return { url: null, error: uploadError.message };
-      const publicUrl = this.getProfilePictureUrl(uploadData.path);
+      const publicUrl = this.getavatarUrl(uploadData.path);
       return { url: publicUrl, error: null };
     } catch {
       return { url: null, error: "Failed to upload profile picture" };
@@ -93,14 +93,14 @@ export class ProfileService {
       if (!url) return { error: null };
 
       const urlObj = new URL(url);
-      const filePath = urlObj.pathname.split(`/storage/v1/object/public/${this.PROFILE_PICTURE_BUCKET}/`)[1];
+      const filePath = urlObj.pathname.split(`/storage/v1/object/public/${this.AVATAR_URL_BUCKET}/`)[1];
 
       if (!filePath) {
         return { error: "Invalid profile picture URL" };
       }
 
       const { error } = await this.supabase.storage
-        .from(this.PROFILE_PICTURE_BUCKET)
+        .from(this.AVATAR_URL_BUCKET)
         .remove([filePath]);
 
       if (error) return { error: error.message };
@@ -120,28 +120,28 @@ export class ProfileService {
         return { data: null, error: "User not authenticated" };
       }
 
-      let profilePictureUrl = updates.profile_picture;
+      let avatarUrl = updates.avatar_url;
       let oldPictureUrl: string | null = null;
 
       if (file) {
         const { data: currentProfile } = await this.supabase
           .from("profiles")
-          .select("profile_picture")
+          .select("avatar_url")
           .eq("id", user.id)
           .single();
 
-        oldPictureUrl = currentProfile?.profile_picture || null;
+        oldPictureUrl = currentProfile?.avatar_url || null;
 
         const { url, error: uploadError } = await this.uploadProfilePicture(file);
         if (uploadError) return { data: null, error: uploadError };
-        profilePictureUrl = url ?? "";
+        avatarUrl = url ?? "";
       }
 
       const { data, error } = await this.supabase
         .from("profiles")
         .update({
           ...updates,
-          profile_picture: profilePictureUrl,
+          avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id)
@@ -163,11 +163,11 @@ export class ProfileService {
     }
   }
 
-  static getProfilePictureUrl(path: string | null): string | null {
+  static getavatarUrl(path: string | null): string | null {
     if (!path) return null;
     try {
       const { data } = this.supabase.storage
-        .from(this.PROFILE_PICTURE_BUCKET)
+        .from(this.AVATAR_URL_BUCKET)
         .getPublicUrl(path);
       return data.publicUrl;
     } catch {
@@ -253,7 +253,7 @@ export class ProfileService {
         return { data: null, error: "User not authenticated" };
       }
 
-      let profilePictureUrl = updates.avatar_url;
+      let avatarUrl = updates.avatar_url;
       let bannerUrl = updates.banner_url;
       let oldPictureUrl: string | null = null;
       let oldBannerUrl: string | null = null;
@@ -270,8 +270,11 @@ export class ProfileService {
         oldPictureUrl = currentProfile?.avatar_url || null;
         const { url, error: uploadError } = await this.uploadProfilePicture(profilePictureFile);
         if (uploadError) return { data: null, error: uploadError };
-        profilePictureUrl = url ?? "";
-      }
+        avatarUrl = url ?? "";
+      }else if (updates.avatar_url === null) {
+		oldPictureUrl = currentProfile?.avatar_url || null;
+		avatarUrl = null;
+	  }
 
       // Handle banner upload
       if (bannerFile) {
@@ -279,13 +282,16 @@ export class ProfileService {
         const { url, error: uploadError } = await this.uploadBanner(bannerFile);
         if (uploadError) return { data: null, error: uploadError };
         bannerUrl = url ?? "";
-      }
+      }else if (updates.banner_url === null) {
+		oldBannerUrl = currentProfile?.banner_url || null;
+		bannerUrl = null;
+	  }
 
       const { data, error } = await this.supabase
         .from("profiles")
         .update({
           ...updates,
-          avatar_url: profilePictureUrl,
+          avatar_url: avatarUrl,
           banner_url: bannerUrl,
           updated_at: new Date().toISOString(),
         })
@@ -313,7 +319,7 @@ export class ProfileService {
     try {
       const urlObj = new URL(url);
       const pathParts = urlObj.pathname.split('/');
-      const bucketIndex = pathParts.indexOf(this.PROFILE_PICTURE_BUCKET);
+      const bucketIndex = pathParts.indexOf(this.AVATAR_URL_BUCKET);
       if (bucketIndex === -1) return null;
       return pathParts.slice(bucketIndex + 1).join('/');
     } catch {
@@ -347,7 +353,6 @@ export async function getProfileById(profileId: string) {
     const profile: ProfileType = {
       id: data.id,
       email: data.email || null,
-      username: data.username || null,
       avatar_url: data.avatar_url || null,
       banner_url: data.banner_url || null,
       bio: data.bio || null,
@@ -357,8 +362,17 @@ export async function getProfileById(profileId: string) {
       wallet_address: data.wallet_address || null,
       reputation: typeof data.reputation === 'number' ? data.reputation : 0,
       achievements: Array.isArray(data.achievements) ? data.achievements : [],
+      fieldOfExpertise: data.fieldOfExpertise || null,
+      discordUrl: data.discordUrl || null,
+      githubUrl: data.githubUrl || null,
+      linkedinUrl: data.linkedinUrl || null,
+      twitterUrl: data.twitterUrl || null,
+      telegramUrl: data.telegramUrl || null,
+      websiteUrl: data.websiteUrl || null,
       created_at: data.created_at,
       updated_at: data.updated_at,
+      firstName: data.firstName || null,
+      lastName: data.lastName || null
     };
     
     return { profile, error: null };

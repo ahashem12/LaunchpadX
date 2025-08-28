@@ -40,7 +40,7 @@ export function MemberRow({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const router = useRouter()
 
-  const initials = (member.username || '')
+  const initials = (member.firstName || '')
     .split(" ")
     .map((part) => part[0])
     .join("")
@@ -52,7 +52,7 @@ export function MemberRow({
       await deleteTeamMember(member.id, member.project_id)
       toast({
         title: "Success",
-        description: `${member.username} has been removed from the project.`,
+        description: `${member.firstName + " " + member.lastName} has been removed from the project.`,
       })
       onDeleteMember(member.id)
       setIsDeleteDialogOpen(false)
@@ -74,13 +74,13 @@ export function MemberRow({
       {/* User Column */}
       <div className="flex items-center space-x-3">
         <Avatar className="h-10 w-10 rounded-lg border border-border bg-muted">
-          <AvatarImage src={member.profile_picture || "/placeholder.svg"} alt={member.username} />
+          <AvatarImage src={member.avatar_url || "/placeholder.svg"} alt={member.firstName + " " + member.lastName} />
           <AvatarFallback className="rounded-lg bg-primary text-primary-foreground font-bold">
             {initials}
           </AvatarFallback>
         </Avatar>
         <div>
-          <div className="font-medium text-foreground">{member.username}</div>
+          <div className="font-medium text-foreground">{member.firstName + " " + member.lastName}</div>
           <div className="text-sm text-muted-foreground">{member.email}</div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export function MemberRow({
               <AlertDialogHeader>
                 <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to remove <span className="font-semibold">{member.username}</span> from the project?
+                  Are you sure you want to remove <span className="font-semibold">{member.firstName + " " + member.lastName}</span> from the project?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

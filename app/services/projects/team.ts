@@ -15,10 +15,11 @@ export async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
         has_connected_wallet,
         created_at,
         profiles:user_id (
-          username,
           email,
-          profile_picture,
-          skills
+          avatar_url,
+          skills,
+          firstName,
+          lastName
         )
       `)
       .eq("project_id", projectId)
@@ -29,9 +30,10 @@ export async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
 
     return data.map((member) => {
       const profile = member.profiles as {
-        username?: string
+        firstName?: string
+        lastName?: string
         email?: string
-        profile_picture?: string
+        avatar_url?: string
         skills?: string[] | string
       } | null
 
@@ -49,9 +51,10 @@ export async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
         id: member.id,
         user_id: member.user_id,
         project_id: member.project_id,
-        username: profile?.username || "",
+        firstName: profile?.firstName || "",
+        lastName: profile?.lastName || "",
         email: profile?.email || "No email",
-        profile_picture: profile?.profile_picture || null,
+        avatar_url: profile?.avatar_url || null,
         role: member.role || "",
         has_connected_wallet: member.has_connected_wallet || false,
         created_at: member.created_at,

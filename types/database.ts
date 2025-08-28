@@ -9,31 +9,45 @@ export interface Database {
     Tables: {
       profiles: {
         Row: {
-          username: string
-          profile_picture: string
+          firstName: string | null
+          lastName: string | null
+          avatar_url: string
           skills: never[]
           id: string
           wallet_address: string | null
           created_at: string
           updated_at: string
-          name: string | null
           email: string | null
+          phone: string | null
+          city: string | null
+          fieldOfExpertise: string | null
+          joiningReason: string | null
         }
         Insert: {
           id: string
           wallet_address?: string | null
-          created_at?: string
-          updated_at?: string
-          name?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          firstName?: string | null
+          lastName?: string | null
           email?: string | null
+          phone?: string | null
+          city?: string | null
+          fieldOfExpertise?: string | null
+          joiningReason?: string | null
         }
         Update: {
           id?: string
           wallet_address?: string | null
-          created_at?: string
-          updated_at?: string
-          name?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          firstName?: string | null
+          lastName?: string | null
           email?: string | null
+          phone?: string | null
+          city?: string | null
+          fieldOfExpertise?: string | null
+          joiningReason?: string | null
         }
       }
       projects: {

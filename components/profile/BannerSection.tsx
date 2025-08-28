@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Camera, Upload, X } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 interface BannerSectionProps {
   bannerUrl: string | null
@@ -16,7 +17,7 @@ interface BannerSectionProps {
 export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: BannerSectionProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
+  const { toast } = useToast()
   // Cleanup preview URL when component unmounts
   useEffect(() => {
     return () => {
@@ -47,6 +48,10 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
       setPreviewUrl(newPreviewUrl)
 
       onBannerChange(file)
+	  toast({
+        title: "Banner selected",
+        description: "Click 'Save Changes' to update your profile banner.",
+      })
     }
   }
 
@@ -87,6 +92,10 @@ export function BannerSection({ bannerUrl, onBannerChange, isEditable = true }: 
     }
 
     onBannerChange(null)
+	toast({
+      title: "Banner removed",
+      description: "Click 'Save Changes' to update your profile banner.",
+    })
   }
 
   return (

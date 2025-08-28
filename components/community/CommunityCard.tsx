@@ -46,6 +46,34 @@ const ReputationBar = ({ reputation }: { reputation: number }) => (
 export function CommunityCard({ member }: CommunityCardProps) {
   const displayedSkills = member.skills?.slice(0, 2) || [];
   const remainingSkills = member.skills ? member.skills.length - displayedSkills.length : 0;
+  
+  // Helper function to get full name or fallback
+  const getDisplayName = () => {
+    if (member.firstName && member.lastName) {
+      return `${member.firstName} ${member.lastName}`;
+    }
+    if (member.firstName) {
+      return member.firstName;
+    }
+    if (member.lastName) {
+      return member.lastName;
+    }
+    return 'Anonymous';
+  };
+  
+  // Helper function to get initials for avatar fallback
+  const getInitials = () => {
+    if (member.firstName && member.lastName) {
+      return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toUpperCase();
+    }
+    if (member.firstName) {
+      return member.firstName.slice(0, 2).toUpperCase();
+    }
+    if (member.lastName) {
+      return member.lastName.slice(0, 2).toUpperCase();
+    }
+    return 'AN';
+  };
 
   return (
     <Card className="w-full max-w-sm h-full flex flex-col rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 bg-card border border-border overflow-hidden group">
@@ -54,7 +82,7 @@ export function CommunityCard({ member }: CommunityCardProps) {
         {member.banner_url ? (
           <Image
             src={member.banner_url}
-            alt={`${member.username} banner`}
+            alt={`${getDisplayName()} banner`}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -69,11 +97,11 @@ export function CommunityCard({ member }: CommunityCardProps) {
         <Avatar className="w-16 h-16 border-4 border-background shadow-lg ring-2 ring-background/50">
           <AvatarImage 
             src={member.avatar_url || ""} 
-            alt={member.username || ""}
+            alt={getDisplayName()}
             className="object-cover"
           />
           <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-            {member.username ? member.username.slice(0, 2).toUpperCase() : <User className="w-6 h-6" />}
+            {getInitials()}
           </AvatarFallback>
         </Avatar>
       </div>
@@ -82,7 +110,7 @@ export function CommunityCard({ member }: CommunityCardProps) {
         {/* Header with name and achievements - centered layout */}
         <div className="text-center space-y-2">
           <h3 className="font-semibold text-lg text-foreground line-clamp-1">
-            {member.username || 'Anonymous'}
+            {getDisplayName()}
           </h3>
           {member.achievements && member.achievements.length > 0 && (
             <div className="flex items-center justify-center gap-1">

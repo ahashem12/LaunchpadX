@@ -5,6 +5,7 @@ import { ProfileHeader } from "./ProfileHeader";
 import { ProfilePictureSection } from "./ProfilePictureSection";
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { SkillsSection } from "./SkillsSection";
+import { SocialMediaSection } from "./SocialMediaSection";
 import { WalletSection } from "./WalletSection";
 import { ReputationSection } from "./ReputationSection";
 import { AchievementsSection } from "./AchievementsSection";
@@ -37,7 +38,8 @@ export function ProfileView({ profile }: ProfileViewProps) {
 
           <div className="xl:col-span-2 space-y-6">
             <PersonalInfoSection
-              username={profile.username || ""}
+              firstName={profile.firstName || ""}
+              lastName={profile.lastName || ""}
               email={profile.email || ""}
               isEditable={false}
             />
@@ -47,6 +49,20 @@ export function ProfileView({ profile }: ProfileViewProps) {
               skills={profile.skills || []}
               isEditable={false}
             />
+            {/* Social Media Icons - Compact Display */}
+            <div className="bg-card rounded-lg border p-4">
+              <h3 className="text-lg font-semibold mb-3">Social Media</h3>
+              <SocialMediaSection
+                discordUrl={profile.discordUrl || ""}
+                githubUrl={profile.githubUrl || ""}
+                linkedinUrl={profile.linkedinUrl || ""}
+                twitterUrl={profile.twitterUrl || ""}
+                telegramUrl={profile.telegramUrl || ""}
+                websiteUrl={profile.websiteUrl || ""}
+                isEditable={false}
+                showIconsOnly={true}
+              />
+            </div>
           </div>
 
           <div className="xl:col-span-1 space-y-6">

@@ -91,7 +91,15 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       <div className="flex-1 py-4 overflow-y-auto">
         <nav className="space-y-1 px-2">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+            let isActive;
+            if (item.href === "/open-roles") {
+              isActive = pathname.startsWith("/open-roles") || pathname.startsWith("/browse/open-roles");
+            } else if (item.href === "/browse") {
+              // Only active for /browse and its subpages, but NOT /browse/open-roles
+              isActive = (pathname === "/browse" || (pathname.startsWith("/browse/") && !pathname.startsWith("/browse/open-roles")));
+            } else {
+              isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            }
             return (
               <Link
                 key={item.href}

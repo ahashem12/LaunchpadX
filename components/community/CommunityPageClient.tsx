@@ -28,7 +28,8 @@ export function CommunityPageClient({
 
     if (searchQuery) {
       filtered = filtered.filter((member) =>
-        member.username?.toLowerCase().includes(searchQuery.toLowerCase())
+        member.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.lastName?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 

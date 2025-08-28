@@ -117,6 +117,7 @@ export async function getCommunityMembers(): Promise<Profile[]> {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
+        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -133,12 +134,20 @@ export async function getCommunityMembers(): Promise<Profile[]> {
       profiles = data.map(profile => ({
         id: profile.id,
         email: profile.email || null,
-        username: profile.username || null,
+        firstName: profile.firstName || null,
+        lastName: profile.lastName || null,
         avatar_url: profile.avatar_url || null,
         banner_url: profile.banner_url || null,
         bio: profile.bio || null,
         role: profile.role || null,
         skills: Array.isArray(profile.skills) ? profile.skills : [],
+        fieldOfExpertise: profile.fieldOfExpertise || null,
+        discordUrl: profile.discordUrl || null,
+        githubUrl: profile.githubUrl || null,
+        linkedinUrl: profile.linkedinUrl || null,
+        twitterUrl: profile.twitterUrl || null,
+        telegramUrl: profile.telegramUrl || null,
+        websiteUrl: profile.websiteUrl || null,
         is_active: profile.is_active ?? true,
         wallet_address: profile.wallet_address || null,
         reputation: typeof profile.reputation === 'number' ? profile.reputation : 0,
@@ -166,7 +175,8 @@ async function getCommunityMembersEssential(supabase: any): Promise<Profile[]> {
       .select(`
         id,
         email,
-        username,
+        firstName,
+        lastName,
         avatar_url,
         banner_url,
         bio,

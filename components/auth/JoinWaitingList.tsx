@@ -9,20 +9,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Logo } from "@/components/ui/logo"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { CheckCircle2 } from "lucide-react"
 
 
 export function JoinWaitingList() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
-    familyName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
     city: "",
-    expertise: "",
+    fieldOfExpertise: "",
     joiningReason: "",       // single choice
   })
   const [errors, setErrors] = useState({ phoneNumber: "", password: "" , name: "", familyName: "" })
@@ -129,8 +130,6 @@ export function JoinWaitingList() {
         description: "Could not log you out after signing up. Please try logging out manually.",
         variant: "destructive",
       })
-    }
-  
     setIsSubmitted(true)
     setTimeout(() => router.push("/login"), 5000)
   }
@@ -140,12 +139,22 @@ export function JoinWaitingList() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
         <Card className="w-full max-w-md">
-          <CardHeader className="items-center text-center">
-            <Logo />
-            <CardTitle className="text-2xl">Thank You!</CardTitle>
-            <CardDescription>
-              Please check your email to confirm your account. You will be notified once an admin has approved your request.
-            </CardDescription>
+          <CardHeader className="items-center text-center space-y-6">
+            <div className="rounded-full bg-green-100 p-3">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl">Thank You!</CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Please check your email to confirm your account. You'll be notified once an admin has approved your request.
+              </CardDescription>
+            </div>
+            <Button 
+              onClick={() => router.push('/login')}
+              className="w-full mt-4"
+            >
+              Go to Login
+            </Button>
           </CardHeader>
         </Card>
       </div>
@@ -166,13 +175,13 @@ export function JoinWaitingList() {
             <div className="grid md:grid-cols-2 md:gap-6">
               {/* Name */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleInputChange}
-                  placeholder="Your Name"
+                  placeholder="Your First Name"
                   required
                   disabled={isLoading}
                 />
@@ -183,11 +192,11 @@ export function JoinWaitingList() {
 
               {/* Family Name */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="familyName">Family Name</Label>
+                <Label htmlFor="lastName">Last Name</Label>
                 <Input
-                  id="familyName"
-                  name="familyName"
-                  value={formData.familyName}
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
                   onChange={handleInputChange}
                   placeholder="Your Family Name"
                   required
@@ -284,18 +293,18 @@ export function JoinWaitingList() {
 
               {/* Field Of Expertise */}
               <div className="space-y-2 py-4">
-                <Label htmlFor="expertise">Field Of Expertise</Label>
+                <Label htmlFor="fieldOfExpertise">Field Of Expertise</Label>
                 <select
-                  id="expertise"
-                  name="expertise"
-                  value={formData.expertise}
+                  id="fieldOfExpertise"
+                  name="fieldOfExpertise"
+                  value={formData.fieldOfExpertise}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
                   className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary !text-black"
                   style={{ color: "#000" }}
                 >
-                  <option value="" className="text-black">Select your expertise</option>
+                  <option value="" className="text-black">Select Your Expertise</option>
                   <option value="Tech" className="text-black">Tech</option>
                   <option value="Business" className="text-black">Business</option>
                   <option value="Content building" className="text-black">Content building</option>

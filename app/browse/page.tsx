@@ -81,7 +81,7 @@ export default function BrowsePage() {
         <BrowseFilters filters={filters} onFiltersChange={setFilters} />
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="h-32 w-full rounded-t-lg bg-muted/50" />
