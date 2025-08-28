@@ -135,7 +135,7 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
                 <li
                   key={skill.id}
                   className="px-3 py-2 cursor-pointer hover:bg-muted"
-                  onClick={() => handleSkillSelect(skill.id)}
+                    onMouseDown={() => handleSkillSelect(skill.id)}
                 >
                   {skill.name}
                 </li>
