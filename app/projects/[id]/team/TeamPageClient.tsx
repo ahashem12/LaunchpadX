@@ -7,12 +7,23 @@ import { createClient } from "@/lib/supabase/client"
 import { ProjectNav } from "@/components/projects/nav/ProjectNav"
 import { TeamMembersTable } from "@/components/projects/nav/team/TeamMembersTable"
 import { TeamRoles } from "@/components/projects/nav/team/TeamRoles"
+import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader"
 
 interface TeamPageClientProps {
   projectId: string
 }
 
 export function TeamPageClient({ projectId }: TeamPageClientProps) {
+  const [projectData, setProjectData] = useState<Project | null>(null)
+
+  useEffect(() => {
+    async function fetchProject() {
+      if (!projectId) return;
+      const project = await projectService.getProject(projectId);
+      setProjectData(project);
+    }
+    fetchProject();
+  }, [projectId]);
   const [project, setProject] = useState<Project | null>(null)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [roles, setRoles] = useState<TeamRole[]>([])
@@ -68,6 +79,10 @@ export function TeamPageClient({ projectId }: TeamPageClientProps) {
 
   return (
     <div className="space-y-6">
+            <div className="flex flex-col space-y-6">
+              {/* <ProjectBanner bannerUrl={projectData?.banner_url} /> */}
+              {projectData && <ProjectHeader project={projectData} />}
+            </div>
       <ProjectNav projectId={projectId} />
 
       <div className="p-6 space-y-8">
