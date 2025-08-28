@@ -27,8 +27,8 @@ export interface ProfileUpdateInput {
   firstName?: string;
   lastName?: string;
   skills?: string[];
-  avatar_url?: string;
-  banner_url?: string;
+  avatar_url?: string | null;
+  banner_url?: string | null;
   bio?: string;
   wallet_address?: string | null;
   fieldOfExpertise?: string | null;
