@@ -1,39 +1,68 @@
-"use client"
+"use client";
 
-import { Edit, Camera } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { PigeonIcon } from "@/components/icons/PigeonIcon"
+import { Edit, Camera } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PigeonIcon } from "@/components/icons/PigeonIcon";
+import { projectService } from "@/app/services/projects/project-service";
+import { useEffect, useState } from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { EditDropdown } from "./EditDropdown"
+} from "@/components/ui/dropdown-menu";
+import { EditDropdown } from "./EditDropdown";
 
 interface ProjectHeaderProps {
   project: {
-    name: string
-    status: string
-    logo_url?: string | null
-    category?: string | null
-    bannerUrl?: string | null
-  }
-  bannerUrl?: string | null
+    id: string;
+    name: string;
+    status: string;
+    logo_url?: string | null;
+    category?: string | null;
+    bannerUrl?: string | null;
+  };
+  bannerUrl?: string | null;
 }
 
 export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
+  const [owner, setOwner] = useState<{ user_id: string; profile?: any } | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOwner() {
+      try {
+        setIsLoading(true);
+        const ownerData = await projectService.getProjectOwner(project.id);
+        setOwner(ownerData);
+      } catch (error) {
+        console.error("Error fetching project owner:", error);
+        setOwner(null);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchOwner();
+  }, [project.id]);
+
   const hasBanner = bannerUrl || project.bannerUrl;
-  
   return (
-    <div className={`relative w-full h-48 rounded-lg overflow-hidden ${!hasBanner ? "bg-gradient-to-r from-green-900 to-green-600" : ""}`}>
+    <div
+      className={`relative w-full h-48 rounded-lg overflow-hidden ${
+        !hasBanner ? "bg-gradient-to-r from-green-900 to-green-600" : ""
+      }`}
+    >
       {/* Banner Image (if exists) */}
       {hasBanner ? (
-        <img 
-          src={hasBanner} 
-          alt="Project banner" 
-          className="w-full h-full object-cover" 
+        <img
+          src={hasBanner}
+          alt="Project banner"
+          className="w-full h-full object-cover"
           onError={(e) => {
             (e.target as HTMLImageElement).src = "/placeholder.svg";
           }}
@@ -51,7 +80,7 @@ export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
       )}
 
       {/* Edit Dropdown */}
-<EditDropdown />
+      <EditDropdown />
       {/* Project Info */}
       <div className="absolute bottom-4 left-6 right-6">
         <div className="flex items-end justify-between">
@@ -64,7 +93,8 @@ export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
                   alt={`${project.name} logo`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234f46e5'/%3E%3Ctext x='50%' y='50%' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E${project.name.substring(0, 2).toUpperCase()}%3C/text%3E%3C/svg%3E";
+                    (e.target as HTMLImageElement).src =
+                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234f46e5'/%3E%3Ctext x='50%' y='50%' font-size='40' fill='white' text-anchor='middle' dominant-baseline='middle'%3E${project.name.substring(0, 2).toUpperCase()}%3C/text%3E%3C/svg%3E";
                   }}
                 />
               ) : (
@@ -79,16 +109,29 @@ export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
             {/* Project Metadata */}
             <div className="flex flex-col">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold text-white drop-shadow-md">{project.name}</h1>
+                <h1 className="text-3xl font-bold text-white drop-shadow-md">
+                  {project.name}
+                </h1>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  <span className="text-sm text-white drop-shadow-md">Updated 0</span>
+                  <span className="text-sm text-white drop-shadow-md">
+                    Updated 0
+                  </span>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-white drop-shadow-md">
-                  Founded by <span className="text-green-300 font-medium">You</span>
+                  Founded by{" "}
+                  <span className="text-green-300 font-medium">
+                    {isLoading
+                      ? "Loading..."
+                      : owner?.profile
+                      ? `${owner.profile.firstName || ""} ${
+                          owner.profile.lastName || ""
+                        }`.trim() || "Unknown"
+                      : "Unknown"}
+                  </span>
                 </span>
                 {project.category && (
                   <span className="text-sm text-white/80 uppercase tracking-wide drop-shadow-md">
@@ -101,5 +144,5 @@ export function ProjectHeader({ project, bannerUrl }: ProjectHeaderProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
