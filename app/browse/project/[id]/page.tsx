@@ -1,21 +1,23 @@
-import { notFound } from "next/navigation"
-import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader"
-import { ProjectDescription } from "@/components/projects/nav/details/ProjectDescription"
-import { ProjectNextSteps } from "@/components/projects/nav/details/ProjectNextSteps"
-import { projectService } from "@/app/services/projects/project-service"
+import { notFound } from "next/navigation";
+import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader";
+import { ProjectDescription } from "@/components/projects/nav/details/ProjectDescription";
+import { ProjectNextSteps } from "@/components/projects/nav/details/ProjectNextSteps";
+import { projectService } from "@/app/services/projects/project-service";
 
 interface BrowseProjectPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
-export default async function BrowseProjectPage({ params }: BrowseProjectPageProps) {
-    const p = await params;
-  const project = await projectService.getProject(p.id)
+export default async function BrowseProjectPage({
+  params,
+}: BrowseProjectPageProps) {
+  const p = await params;
+  const project = await projectService.getProject(p.id);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -23,8 +25,11 @@ export default async function BrowseProjectPage({ params }: BrowseProjectPagePro
       <div className="flex flex-col space-y-6">
         <ProjectHeader project={project} />
       </div>
-      <ProjectDescription description={project.description} />
+      <ProjectDescription
+        description={project.description}
+        projectId={project.id}
+      />
       <ProjectNextSteps projectId={project.id} />
     </div>
-  )
+  );
 }

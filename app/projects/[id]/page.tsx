@@ -1,22 +1,22 @@
-import { notFound } from "next/navigation"
-import { ProjectNav } from "@/components/projects/nav/ProjectNav"
-import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader"
-import { ProjectDescription } from "@/components/projects/nav/details/ProjectDescription"
-import { ProjectNextSteps } from "@/components/projects/nav/details/ProjectNextSteps"
-import { projectService } from "@/app/services/projects/project-service"
+import { notFound } from "next/navigation";
+import { ProjectNav } from "@/components/projects/nav/ProjectNav";
+import { ProjectHeader } from "@/components/projects/nav/details/ProjectHeader";
+import { ProjectDescription } from "@/components/projects/nav/details/ProjectDescription";
+import { ProjectNextSteps } from "@/components/projects/nav/details/ProjectNextSteps";
+import { projectService } from "@/app/services/projects/project-service";
 
 interface DetailsPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default async function DetailsPage(props: DetailsPageProps) {
-  const params = await props.params
-  const project = await projectService.getProject(params.id)
+  const params = await props.params;
+  const project = await projectService.getProject(params.id);
 
   if (!project) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -27,8 +27,11 @@ export default async function DetailsPage(props: DetailsPageProps) {
       </div>
 
       <ProjectNav projectId={params.id} />
-      <ProjectDescription description={project.description} />
+      <ProjectDescription
+        description={project.description}
+        projectId={params.id}
+      />
       <ProjectNextSteps projectId={params.id} />
     </div>
-  )
+  );
 }
