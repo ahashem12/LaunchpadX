@@ -188,3 +188,41 @@ export async function getRoleCategory(roleCategoryID: string): Promise<RoleCateg
     return null
   }
 }
+
+export async function getProjectOwner(projectId: string): Promise<{ user_id: string; profile?: any } | null> {
+  try {
+    if (!validateId(projectId)) {
+      console.error("Invalid UUID format:", projectId)
+      return null
+    }
+
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from("project_members")
+      .select(`
+        user_id,
+        profiles:user_id (
+          email,
+          avatar_url,
+          firstName,
+          lastName
+        )
+      `)
+      .eq("project_id", projectId)
+      .eq("role", "owner")
+      .single()
+
+    if (error) {
+      console.error("Error getting project owner:", error)
+      return null
+    }
+
+    return {
+      user_id: data.user_id,
+      profile: data.profiles
+    }
+  } catch (error) {
+    console.error("Unexpected error getting project owner:", error)
+    return null
+  }
+}
