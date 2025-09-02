@@ -26,7 +26,11 @@ export function JoinWaitingList() {
     fieldOfExpertise: "",
     joiningReason: "",       // single choice
   })
-  const [errors, setErrors] = useState({ phoneNumber: "", password: "" , name: "", familyName: "" })
+  const [errors, setErrors] = useState<{
+    phoneNumber?: string;
+    password?: string;
+    [key: string]: string | undefined;
+  }>({})
   const supabase = createClient()
   const router = useRouter()
 
@@ -38,102 +42,160 @@ export function JoinWaitingList() {
     if (name === "phoneNumber" && errors.phoneNumber) {
       setErrors({ ...errors, phoneNumber: "" })
     }
-    if (name === "name" && errors.name) {
-      setErrors({ ...errors, name: "" })
-    }
-    if (name === "familyName" && errors.familyName) {
-      setErrors({ ...errors, familyName: "" })
-    }
     if (name === "confirmPassword" && errors.password) {
       setErrors({ ...errors, password: "" })
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-  
-    const name = formData.name.trim()
-    const familyName = formData.familyName.trim()
-  
-    const nameRegex = /^[A-Za-z\u0590-\u05FF\s'-]{3,}$/
-  
-    const phoneRegex = /^\+?[0-9\s-]{7,15}$/
-  
-    const nextErrors = { phoneNumber: "", password: "", name: "", familyName: "" }
-  
-    if (!nameRegex.test(name)) {
-      nextErrors.name = "Please enter a valid first name(letters only, min 3)."
-    }
-    if (!nameRegex.test(familyName)) {
-      nextErrors.familyName = "Please enter a valid family name(letters only, min 3)."
-    }
-    if (formData.password !== formData.confirmPassword) {
-      nextErrors.password = "Passwords do not match."
-    }
-    if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
-      nextErrors.phoneNumber = "Please enter a valid phone number."
-    }
-  
-    if (nextErrors.name || nextErrors.familyName || nextErrors.password || nextErrors.phoneNumber) {
-      setErrors(nextErrors)
-      return
-    }
-  
-    setIsLoading(true)
-  
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    })
-  
-    if (signUpError) {
-      setIsLoading(false)
-      let description = "Something went wrong. Please try again."
-      if (signUpError.message.includes("User already registered")) {
-        description = "A user with this email already exists. Please try logging in."
-      } else if (signUpError.message.includes("Password should be at least 6 characters")) {
-        description = "Your password is too weak. Please use at least 6 characters."
-      } else if ((signUpError as any).code === "email_address_invalid") {
-        description = "The email address you entered is invalid. Please provide a valid email."
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+    
+    try {
+      if (formData.password !== formData.confirmPassword) {
+        setErrors({ ...errors, password: "Passwords do not match." })
+        setIsLoading(false)
+        return
       }
-      toast({ title: "Sign-up Error", description, variant: "destructive" })
-      return
-    }
-  
-    const { error: insertError } = await supabase.from("waiting_list").insert({
-      name,
-      familyName,
-      email: formData.email,
-      phone: formData.phoneNumber,
-      city: formData.city,
-      expertise: formData.expertise,
-      joiningReason: formData.joiningReason,
-    })
-  
-    setIsLoading(false)
-  
-    if (insertError) {
-      console.error("Error inserting into waiting list:", insertError)
-      let description = "Could not save your information. Please try again."
-      if (insertError.code === "23505") description = "This email address has already been added to the waiting list."
-      else if (insertError.code === "42501") description = "You do not have permission to perform this action."
-      toast({ title: "Database Error", description, variant: "destructive" })
-      return
-    }
-  
-    const { error: signOutError } = await supabase.auth.signOut()
-    if (signOutError) {
-      console.error("Error signing out:", signOutError)
-      toast({
-        title: "Logout Error",
-        description: "Could not log you out after signing up. Please try logging out manually.",
-        variant: "destructive",
+
+      const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
+      if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
+        setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
+        setIsLoading(false)
+        return
+      }
+      // Sign up the user and get the response
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phoneNumber,
+          },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (signUpError) {
+        setIsLoading(false);
+        let description = "Something went wrong. Please try again.";
+        if (signUpError.message.includes("User already registered")) {
+          description = "A user with this email already exists. Please try logging in.";
+        } else if (signUpError.message.includes("Password should be at least 6 characters")) {
+          description = "Your password is too weak. Please use at least 6 characters.";
+        } else if (signUpError.code === "email_address_invalid") {
+          description = "The email address you entered is invalid. Please provide a valid email.";
+        }
+        toast({
+          title: "Sign-up Error",
+          description,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!user) {
+        throw new Error('Failed to get user from signup response');
+      }
+
+      // Check if a profile with this email already exists
+      // const { data: existingProfile, error: fetchError } = await supabase
+      //   .from('profiles')
+      //   .select('id')
+      //   .eq('email', formData.email)
+      //   .single();
+
+      // let profileError: Error | null = null;
+      
+      const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phoneNumber,
+        city: formData.city,
+        fieldOfExpertise: formData.fieldOfExpertise,
+        joiningReason: formData.joiningReason,
+        updated_at: new Date().toISOString(),
       })
-    setIsSubmitted(true)
-    setTimeout(() => router.push("/login"), 5000)
+      .select();
+      
+      // If profile exists, update it; otherwise, insert a new one
+      // if (existingProfile) {
+      //   const { error: updateError } = await supabase
+      //     .from('profiles')
+      //     .update({
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     })
+      //     .eq('id', existingProfile.id);
+
+      //   profileError = updateError;
+      // } else {
+      //   // Only insert if profile doesn't exist
+      //   const { error: insertError } = await supabase
+      //     .from("profiles")
+      //     .insert({
+      //       id: user.id,
+      //       email: formData.email,
+      //       firstName: formData.firstName,
+      //       lastName: formData.lastName,
+      //       phone: formData.phoneNumber,
+      //       city: formData.city,
+      //       fieldOfExpertise: formData.fieldOfExpertise,
+      //       joiningReason: formData.joiningReason,
+      //     });
+
+      //   profileError = insertError;
+      // }
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      setIsLoading(false);
+
+      // Success case - sign out the user after successful signup
+      const { error: signOutError } = await supabase.auth.signOut();
+
+      if (signOutError) {
+        console.error("Error signing out:", signOutError);
+      } else {
+        // Clear form data
+        const form = e.target as HTMLFormElement;
+        form.reset();
+      }
+      setIsSubmitted(true);
+    } catch (error: any) {
+      console.error("Error in signup process:", error);
+      let description = "An unexpected error occurred. Please try again.";
+      
+      if (error.code === "23505") {
+        description = "This email address is already in use. Please try logging in instead.";
+      } else if (error.code === "42501") {
+        description = "You don't have permission to perform this action.";
+      } else if (error.message) {
+        description = error.message;
+      }
+      
+      toast({
+        title: "Error",
+        description,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
-  
 
   if (isSubmitted) {
     return (
@@ -185,9 +247,6 @@ export function JoinWaitingList() {
                   required
                   disabled={isLoading}
                 />
-                {errors.name && (
-                  <p className="text-sm text-red-500 pt-1">{errors.name}</p>
-                )}
               </div>
 
               {/* Family Name */}
@@ -202,9 +261,6 @@ export function JoinWaitingList() {
                   required
                   disabled={isLoading}
                 />
-                {errors.familyName && (
-                  <p className="text-sm text-red-500 pt-1">{errors.familyName}</p>
-                )}
               </div>
             </div>
 
