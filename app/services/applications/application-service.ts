@@ -73,12 +73,27 @@ export class ApplicationService {
           status,
           profiles!applicant_id (
             id,
+            email,
             firstName,
             lastName,
-            email,
             avatar_url,
+            banner_url,
             bio,
-            skills
+            role,
+            skills,
+            fieldOfExpertise,
+            is_active,
+            wallet_address,
+            reputation,
+            achievements,
+            discordUrl,
+            githubUrl,
+            linkedinUrl,
+            twitterUrl,
+            telegramUrl,
+            websiteUrl,
+            created_at,
+            updated_at
           )
         `
         )
@@ -139,6 +154,42 @@ export class ApplicationService {
       return { data: data as RoleApplication | null, error: null };
     } catch (err) {
       return { data: null, error: "Failed to check application status" };
+    }
+  }
+
+  /**
+   * Get application counts for multiple roles
+   */
+  static async getApplicationCountsForRoles(
+    roleIds: string[]
+  ): Promise<{ data: Record<string, number>; error: string | null }> {
+    try {
+      if (roleIds.length === 0) {
+        return { data: {}, error: null };
+      }
+
+      const { data, error } = await this.supabase
+        .from("role_applications")
+        .select("role_id")
+        .in("role_id", roleIds);
+
+      if (error) {
+        return { data: {}, error: error.message };
+      }
+
+      // Count applications per role
+      const counts: Record<string, number> = {};
+      roleIds.forEach(roleId => {
+        counts[roleId] = 0;
+      });
+
+      data?.forEach((application: any) => {
+        counts[application.role_id] = (counts[application.role_id] || 0) + 1;
+      });
+
+      return { data: counts, error: null };
+    } catch (err) {
+      return { data: {}, error: "Failed to get application counts" };
     }
   }
 
