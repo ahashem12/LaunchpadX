@@ -14,27 +14,52 @@ export class ApplicationService {
     roleId: string
   ): Promise<{ data: RoleApplication | null; error: string | null }> {
     try {
+      console.log(
+        "🔍 ApplicationService.applyForRole called with roleId:",
+        roleId
+      );
+
       const {
         data: { user },
         error: authError,
       } = await this.supabase.auth.getUser();
+
+      console.log("👤 Auth check - User:", user?.id, "Auth error:", authError);
+
       if (authError || !user) {
         return { data: null, error: "User not authenticated" };
       }
 
       // Check if user already applied
-      const { data: existingApplication } = await this.supabase
-        .from("role_applications")
-        .select("id")
-        .eq("role_id", roleId)
-        .eq("applicant_id", user.id)
-        .single();
+      console.log(
+        "🔎 Checking existing application for role:",
+        roleId,
+        "user:",
+        user.id
+      );
+
+      const { data: existingApplication, error: checkError } =
+        await this.supabase
+          .from("role_applications")
+          .select("id")
+          .eq("role_id", roleId)
+          .eq("applicant_id", user.id)
+          .single();
+
+      console.log(
+        "📋 Existing application check:",
+        existingApplication,
+        "Error:",
+        checkError
+      );
 
       if (existingApplication) {
         return { data: null, error: "You have already applied for this role" };
       }
 
       // Create new application
+      console.log("✏️ Creating new application...");
+
       const { data, error } = await this.supabase
         .from("role_applications")
         .insert({
@@ -44,6 +69,8 @@ export class ApplicationService {
         })
         .select()
         .single();
+
+      console.log("💾 Insert result - Data:", data, "Error:", error);
 
       if (error) {
         return { data: null, error: error.message };
@@ -57,11 +84,17 @@ export class ApplicationService {
 
   /**
    * Get applications for a specific role (for project owners)
+   * Updated: simplified profile fields
    */
   static async getApplicationsForRole(
     roleId: string
   ): Promise<{ data: RoleApplicationWithProfile[]; error: string | null }> {
     try {
+      console.log(
+        "🔍 ApplicationService.getApplicationsForRole called with roleId:",
+        roleId
+      );
+
       const { data, error } = await this.supabase
         .from("role_applications")
         .select(
@@ -77,21 +110,7 @@ export class ApplicationService {
             firstName,
             lastName,
             avatar_url,
-            banner_url,
             bio,
-            role,
-            skills,
-            fieldOfExpertise,
-            is_active,
-            wallet_address,
-            reputation,
-            achievements,
-            discordUrl,
-            githubUrl,
-            linkedinUrl,
-            twitterUrl,
-            telegramUrl,
-            websiteUrl,
             created_at,
             updated_at
           )
@@ -100,11 +119,15 @@ export class ApplicationService {
         .eq("role_id", roleId)
         .order("applied_at", { ascending: false });
 
+      console.log("🔍 getApplicationsForRole query result:", { data, error });
+
       if (error) {
+        console.log("❌ getApplicationsForRole database error:", error.message);
         return { data: [], error: error.message };
       }
 
       // Transform the data to match our interface
+      console.log("🔍 Raw data before transformation:", data);
       const transformedData =
         data?.map((item: any) => ({
           id: item.id,
@@ -115,11 +138,14 @@ export class ApplicationService {
           applicant: item.profiles,
         })) || [];
 
+      console.log("🔍 Transformed applications data:", transformedData);
+
       return {
         data: transformedData as RoleApplicationWithProfile[],
         error: null,
       };
     } catch (err) {
+      console.log("❌ getApplicationsForRole exception:", err);
       return { data: [], error: "Failed to fetch applications" };
     }
   }
@@ -179,7 +205,7 @@ export class ApplicationService {
 
       // Count applications per role
       const counts: Record<string, number> = {};
-      roleIds.forEach(roleId => {
+      roleIds.forEach((roleId) => {
         counts[roleId] = 0;
       });
 
