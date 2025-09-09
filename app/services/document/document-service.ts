@@ -288,16 +288,17 @@ export class DocumentService {
    * Download file (handles both public and private)
    */
   static async downloadFile(fileUrl: string, fileName: string, isPrivate = false): Promise<void> {
+    console.log("Downloading file:", fileUrl, "Private:", isPrivate)
     try {
       let blob: Blob
 
-      if (isPrivate) {
-        const path = new URL(fileUrl).pathname.split("/").pop()!
-        const { data, error } = await supabase.storage.from("private-documents").download(path)
-
-        if (error) throw error
-        blob = data
-      } else {
+        if (isPrivate) {
+          // Extract the path and print it for debugging
+            // Use the signed URL to fetch the private document directly
+            const response = await fetch(fileUrl);
+            if (!response.ok) throw new Error("Download failed");
+            blob = await response.blob();
+        } else {
         const response = await fetch(fileUrl)
         if (!response.ok) throw new Error("Download failed")
         blob = await response.blob()
