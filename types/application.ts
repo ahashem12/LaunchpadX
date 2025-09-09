@@ -5,7 +5,6 @@ export interface RoleApplication {
   role_id: string;
   applicant_id: string;
   applied_at: string;
-  status: "pending" | "accepted" | "rejected";
 }
 
 export interface RoleApplicationWithProfile {
@@ -13,6 +12,5 @@ export interface RoleApplicationWithProfile {
   role_id: string;
   applicant_id: string;
   applied_at: string;
-  status: "pending" | "accepted" | "rejected";
   applicant: Profile;
 }

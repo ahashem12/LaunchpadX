@@ -121,25 +121,14 @@ export function useRoleApplication(roleId: string) {
     }
 
     if (application) {
-      switch (application.status) {
-        case "pending":
-          return compact ? "Applied" : "Application Submitted";
-        case "accepted":
-          return compact ? "Accepted" : "Application Accepted";
-        case "rejected":
-          return compact ? "Rejected" : "Application Rejected";
-        default:
-          return "Apply";
-      }
+      return compact ? "Applied" : "Application Submitted";
     }
 
     return isApplying ? "Applying..." : "Apply Now";
   };
 
   const getButtonVariant = () => {
-    if (application?.status === "accepted") return "default";
-    if (application?.status === "rejected") return "outline";
-    if (application?.status === "pending") return "secondary";
+    if (application) return "secondary";
     return "default";
   };
 
