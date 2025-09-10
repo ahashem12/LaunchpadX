@@ -53,8 +53,8 @@ export default function ProjectBrowseCard({ project, isMember }: ProjectBrowseCa
 
         {/* Project Logo */}
         <div className="absolute -bottom-6 left-4">
-          <Avatar className="w-12 h-12 border-2 border-background shadow-lg">
-            <AvatarImage src={project.logo_url || "/placeholder.svg"} alt={project.name} />
+          <Avatar className="w-20 h-20 border-2 border-background shadow-lg">
+            <AvatarImage src={project.logo_url || "/placeholder.svg"} alt={project.name} style={{ objectFit: "contain", width: "100%", height: "100%" }} />
             <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-primary-foreground font-bold text-sm">
               {project.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
