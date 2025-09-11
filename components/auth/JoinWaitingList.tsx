@@ -1,25 +1,20 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Logo } from "@/components/ui/logo";
-import { toast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { useState } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Logo } from "@/components/ui/logo"
+import { toast } from "@/hooks/use-toast"
+import { useRouter } from "next/navigation"
+import { CheckCircle2 } from "lucide-react"
+
 
 export function JoinWaitingList() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -29,56 +24,49 @@ export function JoinWaitingList() {
     confirmPassword: "",
     city: "",
     fieldOfExpertise: "",
-    joiningReason: "", // single choice
-  });
+    joiningReason: "",       // single choice
+  })
   const [errors, setErrors] = useState<{
     phoneNumber?: string;
     password?: string;
     [key: string]: string | undefined;
-  }>({});
-  const supabase = createClient();
-  const router = useRouter();
+  }>({})
+  const supabase = createClient()
+  const router = useRouter()
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
     if (name === "phoneNumber" && errors.phoneNumber) {
-      setErrors({ ...errors, phoneNumber: "" });
+      setErrors({ ...errors, phoneNumber: "" })
     }
     if (name === "confirmPassword" && errors.password) {
-      setErrors({ ...errors, password: "" });
+      setErrors({ ...errors, password: "" })
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setErrors({});
-
+    
     try {
       if (formData.password !== formData.confirmPassword) {
-        setErrors({ ...errors, password: "Passwords do not match." });
-        setIsLoading(false);
-        return;
+        setErrors({ ...errors, password: "Passwords do not match." })
+        setIsLoading(false)
+        return
       }
 
-      // More flexible phone validation - accepts international formats
-      const phoneRegex = /^[\+]?[(]?[\d\s\-\.\(\)]{7,20}$/;
+      const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/
       if (formData.phoneNumber && !phoneRegex.test(formData.phoneNumber)) {
-        setErrors({
-          ...errors,
-          phoneNumber: "Please enter a valid phone number (7-20 digits).",
-        });
-        setIsLoading(false);
-        return;
+        setErrors({ ...errors, phoneNumber: "Please enter a valid phone number." })
+        setIsLoading(false)
+        return
       }
       // Sign up the user and get the response
-      const {
-        data: { user },
-        error: signUpError,
-      } = await supabase.auth.signUp({
+      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -95,18 +83,11 @@ export function JoinWaitingList() {
         setIsLoading(false);
         let description = "Something went wrong. Please try again.";
         if (signUpError.message.includes("User already registered")) {
-          description =
-            "A user with this email already exists. Please try logging in.";
-        } else if (
-          signUpError.message.includes(
-            "Password should be at least 6 characters"
-          )
-        ) {
-          description =
-            "Your password is too weak. Please use at least 6 characters.";
+          description = "A user with this email already exists. Please try logging in.";
+        } else if (signUpError.message.includes("Password should be at least 6 characters")) {
+          description = "Your password is too weak. Please use at least 6 characters.";
         } else if (signUpError.code === "email_address_invalid") {
-          description =
-            "The email address you entered is invalid. Please provide a valid email.";
+          description = "The email address you entered is invalid. Please provide a valid email.";
         }
         toast({
           title: "Sign-up Error",
@@ -117,7 +98,7 @@ export function JoinWaitingList() {
       }
 
       if (!user) {
-        throw new Error("Failed to get user from signup response");
+        throw new Error('Failed to get user from signup response');
       }
 
       // Check if a profile with this email already exists
@@ -128,22 +109,22 @@ export function JoinWaitingList() {
       //   .single();
 
       // let profileError: Error | null = null;
-
+      
       const { error: profileError } = await supabase
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phoneNumber,
-          city: formData.city,
-          fieldOfExpertise: formData.fieldOfExpertise,
-          joiningReason: formData.joiningReason,
-          updated_at: new Date().toISOString(),
-        })
-        .select();
-
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phoneNumber,
+        city: formData.city,
+        fieldOfExpertise: formData.fieldOfExpertise,
+        joiningReason: formData.joiningReason,
+        updated_at: new Date().toISOString(),
+      })
+      .select();
+      
       // If profile exists, update it; otherwise, insert a new one
       // if (existingProfile) {
       //   const { error: updateError } = await supabase
@@ -197,16 +178,15 @@ export function JoinWaitingList() {
     } catch (error: any) {
       console.error("Error in signup process:", error);
       let description = "An unexpected error occurred. Please try again.";
-
+      
       if (error.code === "23505") {
-        description =
-          "This email address is already in use. Please try logging in instead.";
+        description = "This email address is already in use. Please try logging in instead.";
       } else if (error.code === "42501") {
         description = "You don't have permission to perform this action.";
       } else if (error.message) {
         description = error.message;
       }
-
+      
       toast({
         title: "Error",
         description,
@@ -215,7 +195,7 @@ export function JoinWaitingList() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   if (isSubmitted) {
     return (
@@ -228,12 +208,11 @@ export function JoinWaitingList() {
             <div className="space-y-2">
               <CardTitle className="text-2xl">Thank You!</CardTitle>
               <CardDescription className="text-muted-foreground">
-                Please check your email to confirm your account. You'll be
-                notified once an admin has approved your request.
+                Please check your email to confirm your account. You'll be notified once an admin has approved your request.
               </CardDescription>
             </div>
-            <Button
-              onClick={() => router.push("/login")}
+            <Button 
+              onClick={() => router.push('/login')}
               className="w-full mt-4"
             >
               Go to Login
@@ -241,18 +220,17 @@ export function JoinWaitingList() {
           </CardHeader>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
     <div className="flex flex-col items-center justify-start pt-12 sm:pt-16 md:pt-4 md:pb-24 lg:w-full">
+
       <Card className="w-full max-w-lg md:max-w-3xl lg:max-w-7xl">
         <CardHeader className="items-center text-center">
           <Logo />
           <CardTitle className="text-2xl">Join the Waiting List</CardTitle>
-          <CardDescription>
-            Be the first to know when we launch.
-          </CardDescription>
+          <CardDescription>Be the first to know when we launch.</CardDescription>
         </CardHeader>
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -316,9 +294,7 @@ export function JoinWaitingList() {
                   disabled={isLoading}
                 />
                 {errors.phoneNumber && (
-                  <p className="text-sm text-red-500 pt-1">
-                    {errors.phoneNumber}
-                  </p>
+                  <p className="text-sm text-red-500 pt-1">{errors.phoneNumber}</p>
                 )}
               </div>
             </div>
@@ -352,9 +328,7 @@ export function JoinWaitingList() {
                   required
                   disabled={isLoading}
                 />
-                {errors.password && (
-                  <p className="text-sm text-red-500 pt-1">{errors.password}</p>
-                )}
+                {errors.password && <p className="text-sm text-red-500 pt-1">{errors.password}</p>}
               </div>
             </div>
 
@@ -386,24 +360,12 @@ export function JoinWaitingList() {
                   className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary !text-black"
                   style={{ color: "#000" }}
                 >
-                  <option value="" className="text-black">
-                    Select Your Expertise
-                  </option>
-                  <option value="Tech" className="text-black">
-                    Tech
-                  </option>
-                  <option value="Business" className="text-black">
-                    Business
-                  </option>
-                  <option value="Content building" className="text-black">
-                    Content building
-                  </option>
-                  <option value="Data" className="text-black">
-                    Data
-                  </option>
-                  <option value="Other" className="text-black">
-                    Other
-                  </option>
+                  <option value="" className="text-black">Select Your Expertise</option>
+                  <option value="Tech" className="text-black">Tech</option>
+                  <option value="Business" className="text-black">Business</option>
+                  <option value="Content building" className="text-black">Content building</option>
+                  <option value="Data" className="text-black">Data</option>
+                  <option value="Other" className="text-black">Other</option>
                 </select>
               </div>
             </div>
@@ -417,7 +379,7 @@ export function JoinWaitingList() {
                   "Build Projects",
                   'Contribute Expertise - "Know how"',
                   "Become a Partner",
-                ].map((reason) => (
+                ].map(reason => (
                   <label key={reason} className="inline-flex items-center">
                     <input
                       type="radio"
@@ -434,11 +396,7 @@ export function JoinWaitingList() {
               </div>
             </div>
             <div className="flex justify-center">
-              <Button
-                type="submit"
-                className="w-full md:w-1/2"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full md:w-1/2" disabled={isLoading}>
                 {isLoading ? "Joining..." : "Join Now"}
               </Button>
             </div>
@@ -446,5 +404,5 @@ export function JoinWaitingList() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
