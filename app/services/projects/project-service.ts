@@ -19,9 +19,6 @@ import {
 import { getTeamMembers, getProjectRoles, getRoleCategoryCounts } from "./team";
 import { skillService } from "../skills";
 import { roleService } from "../roles";
-
-import { ApplicationService } from "../applications/application-service";
-
 import { get } from "http";
 
 export const projectService = {
@@ -44,9 +41,4 @@ export const projectService = {
   hasProjectAccess,
   ...skillService,
   ...roleService,
-  // Application services
-  applyForRole: ApplicationService.applyForRole,
-  getApplicationsForRole: ApplicationService.getApplicationsForRole,
-  getUserApplicationStatus: ApplicationService.getUserApplicationStatus,
-  updateApplicationStatus: ApplicationService.updateApplicationStatus,
 };
