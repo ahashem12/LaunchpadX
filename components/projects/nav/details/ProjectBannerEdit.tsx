@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { updateProject } from "@/app/services/projects/update";
 import { ProjectBannerService } from "@/app/services/projects/banner-service";
+import { FILE_UPLOAD_LIMITS } from "@/lib/constants/file-upload";
 
 interface ProjectBannerEditProps {
   projectId: string;
@@ -66,7 +67,7 @@ export function ProjectBannerEdit({
     const file = event.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
       // Check file size (5MB limit)
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > FILE_UPLOAD_LIMITS.MAX_BANNER_SIZE) {
         toast({
           title: "File too large",
           description: "Please select an image smaller than 5MB.",
@@ -105,7 +106,7 @@ export function ProjectBannerEdit({
 
     const file = event.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > FILE_UPLOAD_LIMITS.MAX_BANNER_SIZE) {
         toast({
           title: "File too large",
           description: "Please select an image smaller than 5MB.",

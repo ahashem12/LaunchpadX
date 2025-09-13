@@ -1,16 +1,11 @@
 import { createClient } from "@/lib/supabase/client";
+import {
+  FILE_UPLOAD_LIMITS,
+  ALLOWED_IMAGE_TYPES,
+} from "@/lib/constants/file-upload";
 
 export class ProjectBannerService {
   private static supabase = createClient();
-  private static readonly BUCKET_NAME = "public-documents"; // Use existing bucket
-  private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-  private static readonly ALLOWED_FILE_TYPES = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
 
   /**
    * Upload a banner image for a project
@@ -22,7 +17,7 @@ export class ProjectBannerService {
   ): Promise<{ url: string | null; error: string | null }> {
     try {
       // Validate file type
-      if (!this.ALLOWED_FILE_TYPES.includes(file.type)) {
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type as any)) {
         return {
           url: null,
           error: "Only JPEG, PNG, WebP, and GIF images are allowed",
@@ -30,7 +25,7 @@ export class ProjectBannerService {
       }
 
       // Validate file size
-      if (file.size > this.MAX_FILE_SIZE) {
+      if (file.size > FILE_UPLOAD_LIMITS.MAX_BANNER_SIZE) {
         return { url: null, error: "Image size must be less than 5MB" };
       }
 
@@ -53,44 +48,5 @@ export class ProjectBannerService {
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
-  }
-
-  /**
-   * Get the public URL for a banner image
-   */
-  static getBannerUrl(path: string): string {
-    const { data } = this.supabase.storage
-      .from(this.BUCKET_NAME)
-      .getPublicUrl(path);
-
-    return data.publicUrl;
-  }
-
-  /**
-   * Delete a banner image from storage
-   */
-  static async deleteBanner(
-    bannerUrl: string
-  ): Promise<{ success: boolean; error: string | null }> {
-    try {
-      // Extract path from URL
-      const url = new URL(bannerUrl);
-      const pathParts = url.pathname.split("/");
-      const filePath = pathParts.slice(-2).join("/"); // Get the last two parts (folder/filename)
-
-      const { error } = await this.supabase.storage
-        .from(this.BUCKET_NAME)
-        .remove([filePath]);
-
-      if (error) {
-        console.warn("Storage delete warning:", error.message);
-        return { success: false, error: error.message };
-      }
-
-      return { success: true, error: null };
-    } catch (error) {
-      console.warn("Failed to delete banner from storage:", error);
-      return { success: false, error: "Failed to delete banner" };
-    }
   }
 }
