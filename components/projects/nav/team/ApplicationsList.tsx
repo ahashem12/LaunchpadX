@@ -2,12 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { ApplicationService } from "@/app/services/applications/application-service";
-import { ProfileView } from "@/components/profile/ProfileView";
+import { ProfileDialog } from "@/components/profile/ProfileDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, CheckCircle, XCircle, Clock, User } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  Clock,
+  User,
+  Eye,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { RoleApplicationWithProfile, TeamRole } from "@/types";
 
@@ -21,6 +28,9 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
     RoleApplicationWithProfile[]
   >([]);
   const [selectedApplication, setSelectedApplication] =
+    useState<RoleApplicationWithProfile | null>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [profileToView, setProfileToView] =
     useState<RoleApplicationWithProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
@@ -84,6 +94,11 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
     }
 
     setIsUpdating(null);
+  };
+
+  const handleViewProfile = (application: RoleApplicationWithProfile) => {
+    setProfileToView(application);
+    setProfileDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -175,9 +190,42 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
               {new Date(selectedApplication.applied_at).toLocaleDateString()}
             </p>
           </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage
+                    src={selectedApplication.applicant.avatar_url || ""}
+                  />
+                  <AvatarFallback>
+                    {selectedApplication.applicant.firstName?.[0] || ""}
+                    {selectedApplication.applicant.lastName?.[0] || ""}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {selectedApplication.applicant.firstName}{" "}
+                    {selectedApplication.applicant.lastName}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedApplication.applicant.email}
+                  </p>
+                  {selectedApplication.applicant.bio && (
+                    <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                      {selectedApplication.applicant.bio}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => handleViewProfile(selectedApplication)}
+              >
+                View Full Profile
+              </Button>
+            </div>
+          </CardContent>
         </Card>
-
-        <ProfileView profile={selectedApplication.applicant} />
       </div>
     );
   }
@@ -209,16 +257,10 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
         ) : (
           <div className="space-y-4">
             {applications.map((application) => (
-              <Card
-                key={application.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-              >
+              <Card key={application.id} className="transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
-                    <div
-                      className="flex items-center space-x-4 flex-1"
-                      onClick={() => setSelectedApplication(application)}
-                    >
+                    <div className="flex items-center space-x-4 flex-1">
                       <Avatar className="h-12 w-12">
                         <AvatarImage
                           src={application.applicant.avatar_url || ""}
@@ -230,10 +272,21 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
                       </Avatar>
 
                       <div className="flex-1">
-                        <h3 className="font-medium">
-                          {application.applicant.firstName}{" "}
-                          {application.applicant.lastName}
-                        </h3>
+                        <div className="flex items-center space-x-2 mb-1">
+                          <h3 className="font-medium">
+                            {application.applicant.firstName}{" "}
+                            {application.applicant.lastName}
+                          </h3>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleViewProfile(application)}
+                            className="h-6 px-3 py-1 text-xs"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View Profile
+                          </Button>
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           {application.applicant.email}
                         </p>
@@ -290,6 +343,13 @@ export function ApplicationsList({ role, onBack }: ApplicationsListProps) {
           </div>
         )}
       </div>
+
+      {/* Profile Dialog */}
+      <ProfileDialog
+        profile={profileToView?.applicant || null}
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+      />
     </div>
   );
 }
