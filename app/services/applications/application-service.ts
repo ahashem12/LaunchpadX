@@ -65,6 +65,7 @@ export class ApplicationService {
         .insert({
           role_id: roleId,
           applicant_id: user.id,
+          status: "pending",
         })
         .select()
         .single();
@@ -102,6 +103,7 @@ export class ApplicationService {
           role_id,
           applicant_id,
           applied_at,
+          status,
           profiles!applicant_id (
             id,
             email,
@@ -132,6 +134,7 @@ export class ApplicationService {
           role_id: item.role_id,
           applicant_id: item.applicant_id,
           applied_at: item.applied_at,
+          status: item.status,
           applicant: item.profiles,
         })) || [];
 
@@ -213,6 +216,31 @@ export class ApplicationService {
       return { data: counts, error: null };
     } catch (err) {
       return { data: {}, error: "Failed to get application counts" };
+    }
+  }
+
+  /**
+   * Update application status (for project owners)
+   */
+  static async updateApplicationStatus(
+    applicationId: string,
+    status: "accepted" | "rejected"
+  ): Promise<{ data: RoleApplication | null; error: string | null }> {
+    try {
+      const { data, error } = await this.supabase
+        .from("role_applications")
+        .update({ status })
+        .eq("id", applicationId)
+        .select()
+        .single();
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      return { data: data as RoleApplication, error: null };
+    } catch (err) {
+      return { data: null, error: "Failed to update application status" };
     }
   }
 }

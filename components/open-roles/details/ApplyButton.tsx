@@ -40,7 +40,7 @@ export function ApplyButton({ roleId, className = "" }: ApplyButtonProps) {
           </h3>
           <p className="text-muted-foreground text-sm">
             {application
-              ? "Application submitted successfully!"
+              ? `Application status: ${application.status}`
               : "Submit your application to be considered for this position."}
           </p>
         </div>
@@ -55,7 +55,7 @@ export function ApplyButton({ roleId, className = "" }: ApplyButtonProps) {
           {getButtonContent(false)} {/* false for full text */}
         </Button>
 
-        {application && (
+        {application?.status === "pending" && (
           <p className="text-xs text-muted-foreground text-center">
             Applied on {new Date(application.applied_at).toLocaleDateString()}
           </p>

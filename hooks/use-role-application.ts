@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { ApplicationService } from "@/app/services/applications/application-service";
 import { useToast } from "@/hooks/use-toast";
-import { createClient } from "@/lib/supabase/client";
 import type { RoleApplication } from "@/types/application";
 
 // Simple shared state for synchronization
@@ -14,7 +13,6 @@ export function useRoleApplication(roleId: string) {
     applicationCache.get(roleId) || null
   );
   const [isApplying, setIsApplying] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -50,16 +48,8 @@ export function useRoleApplication(roleId: string) {
       // Notify all subscribers
       subscribers.get(roleId)?.forEach((callback) => callback());
 
-      // Check authentication
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      const authenticated = !!user;
-      setIsAuthenticated(authenticated);
-
-      // If authenticated, check application status
-      if (authenticated && roleId) {
+      // Check application status
+      if (roleId) {
         const { data } = await ApplicationService.getUserApplicationStatus(
           roleId
         );
@@ -79,14 +69,6 @@ export function useRoleApplication(roleId: string) {
 
   const handleApply = async () => {
     if (!roleId) return;
-
-    if (!isAuthenticated) {
-      // Redirect to login
-      window.location.href = `/login?redirect=${encodeURIComponent(
-        window.location.pathname
-      )}`;
-      return;
-    }
 
     setIsApplying(true);
     const { data, error } = await ApplicationService.applyForRole(roleId);
@@ -116,19 +98,26 @@ export function useRoleApplication(roleId: string) {
       return "Loading...";
     }
 
-    if (!isAuthenticated) {
-      return "Login to Apply";
-    }
-
     if (application) {
-      return compact ? "Applied" : "Application Submitted";
+      switch (application.status) {
+        case "pending":
+          return compact ? "Applied" : "Application Submitted";
+        case "accepted":
+          return compact ? "Accepted" : "Application Accepted";
+        case "rejected":
+          return compact ? "Rejected" : "Application Rejected";
+        default:
+          return "Apply";
+      }
     }
 
     return isApplying ? "Applying..." : "Apply Now";
   };
 
   const getButtonVariant = () => {
-    if (application) return "secondary";
+    if (application?.status === "accepted") return "default";
+    if (application?.status === "rejected") return "outline";
+    if (application?.status === "pending") return "secondary";
     return "default";
   };
 
@@ -139,7 +128,6 @@ export function useRoleApplication(roleId: string) {
   return {
     application,
     isApplying,
-    isAuthenticated,
     isLoading,
     handleApply,
     getButtonContent,
