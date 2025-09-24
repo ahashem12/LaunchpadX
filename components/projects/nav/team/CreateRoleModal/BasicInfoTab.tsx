@@ -1,68 +1,81 @@
-import { useState, useEffect } from "react"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
-import { projectService } from "@/app/services/projects/project-service"
-import { Skill } from "@/app/services/skills"
-import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { projectService } from "@/app/services/projects/project-service";
+import { Skill } from "@/app/services/skills";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { useCachedSkillService } from "@/lib/services/cached/useCachedSkillService";
+import { useCachedRoleService } from "@/lib/services/cached/useCachedRoleService";
 
 interface RoleType {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface RoleCategory {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface BasicInfoTabProps {
   data: {
-    title: string
-    description: string
-    role_type: string
-    role_category: string
-    required_skills: string[]
-  }
-  onDataChange: (field: string, value: string | string[]) => void
+    title: string;
+    description: string;
+    role_type: string;
+    role_category: string;
+    required_skills: string[];
+  };
+  onDataChange: (field: string, value: string | string[]) => void;
 }
 
 export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
-  const [roleTypes, setRoleTypes] = useState<RoleType[]>([])
-  const [roleCategories, setRoleCategories] = useState<RoleCategory[]>([])
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isDropdownOpen, setDropdownOpen] = useState(false)
-
+  const [roleTypes, setRoleTypes] = useState<RoleType[]>([]);
+  const [roleCategories, setRoleCategories] = useState<RoleCategory[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const { getAllSkills } = useCachedSkillService();
+  const { getRoleCategories } = useCachedRoleService();
+  const { getRoleTypes } = useCachedRoleService();
   useEffect(() => {
     const fetchInitialData = async () => {
-      const { data: typesData } = await projectService.getRoleTypes()
-      const { data: categoriesData } = await projectService.getRoleCategories()
-      const skillsData = await projectService.getAllSkills()
-      setRoleTypes(typesData || [])
-      setRoleCategories(categoriesData || [])
-      setSkills(skillsData)
-    }
-    fetchInitialData()
-  }, [])
+      const { data: typesData } = await getRoleTypes();
+      const { data: categoriesData } = await getRoleCategories();
+      const skillsData = await getAllSkills();
+      setRoleTypes(typesData || []);
+      setRoleCategories(categoriesData || []);
+      setSkills(skillsData);
+    };
+    fetchInitialData();
+  }, []);
 
   const handleSkillSelect = (skillId: string) => {
     if (!data.required_skills.includes(skillId)) {
-      onDataChange("required_skills", [...data.required_skills, skillId])
+      onDataChange("required_skills", [...data.required_skills, skillId]);
     }
-    setSearchTerm("")
-    setDropdownOpen(false)
-  }
+    setSearchTerm("");
+    setDropdownOpen(false);
+  };
 
   const handleSkillRemove = (skillId: string) => {
-    onDataChange("required_skills", data.required_skills.filter((id) => id !== skillId))
-  }
+    onDataChange(
+      "required_skills",
+      data.required_skills.filter((id) => id !== skillId),
+    );
+  };
 
   const filteredSkills = skills.filter((skill) =>
     skill.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  );
 
   return (
     <div className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
@@ -70,7 +83,10 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
         <Label htmlFor="role-type" className="text-foreground">
           Role Type <span className="text-red-500">*</span>
         </Label>
-        <Select value={data.role_type} onValueChange={(value) => onDataChange("role_type", value)}>
+        <Select
+          value={data.role_type}
+          onValueChange={(value) => onDataChange("role_type", value)}
+        >
           <SelectTrigger className="mt-1.5 bg-muted border-border text-foreground">
             <SelectValue placeholder="Select a Role Type" />
           </SelectTrigger>
@@ -88,7 +104,10 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
         <Label htmlFor="role-category" className="text-foreground">
           Role Category <span className="text-red-500">*</span>
         </Label>
-        <Select value={data.role_category} onValueChange={(value) => onDataChange("role_category", value)}>
+        <Select
+          value={data.role_category}
+          onValueChange={(value) => onDataChange("role_category", value)}
+        >
           <SelectTrigger className="mt-1.5 bg-muted border-border text-foreground">
             <SelectValue placeholder="Select a Category" />
           </SelectTrigger>
@@ -135,7 +154,7 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
                 <li
                   key={skill.id}
                   className="px-3 py-2 cursor-pointer hover:bg-muted"
-                    onMouseDown={() => handleSkillSelect(skill.id)}
+                  onMouseDown={() => handleSkillSelect(skill.id)}
                 >
                   {skill.name}
                 </li>
@@ -145,17 +164,24 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           {data.required_skills.map((skillId) => {
-            const skill = skills.find((s) => s.id === skillId)
+            const skill = skills.find((s) => s.id === skillId);
             return (
               skill && (
-                <Badge key={skill.id} variant="secondary" className="flex items-center gap-1">
+                <Badge
+                  key={skill.id}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
                   {skill.name}
-                  <button onClick={() => handleSkillRemove(skill.id)} className="focus:outline-none">
+                  <button
+                    onClick={() => handleSkillRemove(skill.id)}
+                    className="focus:outline-none"
+                  >
                     <X className="h-3 w-3" />
                   </button>
                 </Badge>
               )
-            )
+            );
           })}
         </div>
       </div>
@@ -174,5 +200,5 @@ export function BasicInfoTab({ data, onDataChange }: BasicInfoTabProps) {
         />
       </div>
     </div>
-  )
+  );
 }
