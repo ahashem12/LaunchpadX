@@ -1,4 +1,11 @@
-import { createContext, useCallback, useMemo, useState } from "react";
+"use client";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import { CacheManager, CacheStats } from "../cache/CacheManager";
 
 export type DataProviderContextType = {
@@ -148,4 +155,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </DataProviderContext.Provider>
   );
+};
+
+export const useDataProvider = (): DataProviderContextType => {
+  const context = useContext(DataProviderContext);
+  if (context === undefined) {
+    throw new Error("useDataProvider must be used within a DataProvider");
+  }
+  return context;
 };
